@@ -1,6 +1,5 @@
-package com.suryadeep.openshop.exceptions;
+package com.suryadeep.openshop.exception;
 
-import com.suryadeep.openshop.model.Product;
 
 public class ProductNotFoundException extends RuntimeException {
     public ProductNotFoundException() {

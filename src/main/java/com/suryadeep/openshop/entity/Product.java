@@ -1,4 +1,4 @@
-package com.suryadeep.openshop.model;
+package com.suryadeep.openshop.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

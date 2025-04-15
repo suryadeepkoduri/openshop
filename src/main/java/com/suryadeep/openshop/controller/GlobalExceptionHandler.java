@@ -1,6 +1,6 @@
 package com.suryadeep.openshop.controller;
 
-import com.suryadeep.openshop.exceptions.ProductNotFoundException;
+import com.suryadeep.openshop.exception.ProductNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

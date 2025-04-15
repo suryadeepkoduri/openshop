@@ -1,7 +1,7 @@
 package com.suryadeep.openshop.service;
 
-import com.suryadeep.openshop.exceptions.ProductNotFoundException;
-import com.suryadeep.openshop.model.Product;
+import com.suryadeep.openshop.exception.ProductNotFoundException;
+import com.suryadeep.openshop.entity.Product;
 import com.suryadeep.openshop.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;

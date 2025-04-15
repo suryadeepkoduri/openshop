@@ -1,6 +1,6 @@
 package com.suryadeep.openshop.controller;
 
-import com.suryadeep.openshop.model.Product;
+import com.suryadeep.openshop.entity.Product;
 import com.suryadeep.openshop.service.ProductService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

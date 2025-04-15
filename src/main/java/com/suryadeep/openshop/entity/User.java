@@ -1,4 +1,4 @@
-package com.suryadeep.openshop.model;
+package com.suryadeep.openshop.entity;
 
 public class User {
     private String userId;
