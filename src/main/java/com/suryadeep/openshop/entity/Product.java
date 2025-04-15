@@ -1,13 +1,12 @@
 package com.suryadeep.openshop.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,10 +15,25 @@ import lombok.Setter;
 @Entity
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long productId;
-    private String productName;
-    private String productDescription;
-    private String productImage;
-    private double productPrice;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    private String name;
+    private String description;
+
+    @ManyToMany
+    @JoinTable(
+            name = "product_images",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "image_id")
+    )
+    private List<Image> images;
+    private boolean isEnabled;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
+    private List<Variant> variants;
+
 }
