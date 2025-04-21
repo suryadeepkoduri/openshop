@@ -12,6 +12,8 @@ import com.suryadeep.openshop.repository.ProductRepository;
 import com.suryadeep.openshop.service.ProductService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -97,6 +99,11 @@ public class ProductServiceImpl implements ProductService {
         return productResponses;
     }
 
+    public Page<ProductResponse> findAllPaginated(int page,int size) {
+        return productRepository.findAll(PageRequest.of(page,size))
+                .map(entityMapper::toProductResponse);
+    }
+
     @Override
     public List<ProductResponse> getProductsByCategory(Long categoryId) {
         List<Product> products = productRepository.findAllByCategoryId(categoryId);
@@ -105,5 +112,11 @@ public class ProductServiceImpl implements ProductService {
             productResponses.add(entityMapper.toProductResponse(p));
         }
         return productResponses;
+    }
+
+    @Override
+    public Page<ProductResponse> findByCategoryPaginated(Long categoryId, int page, int size) {
+        return productRepository.findAllByCategoryId(categoryId, PageRequest.of(page, size))
+                .map(entityMapper::toProductResponse);
     }
 }

@@ -1,8 +1,8 @@
 package com.suryadeep.openshop.dto.request;
 
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 public class CategoryRequest {
     private String name;
     private String description;

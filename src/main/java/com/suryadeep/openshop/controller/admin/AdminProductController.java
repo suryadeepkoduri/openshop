@@ -12,17 +12,14 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/admin/products")
-public class ProductController {
+public class AdminProductController {
     private final ProductService productService;
 
     @PostMapping("")
     public ResponseEntity<ProductResponse>  addProduct(@Valid @RequestBody ProductRequest productRequest) {
         return new ResponseEntity<>(productService.addProduct(productRequest), HttpStatus.CREATED);
     }
-    @GetMapping("/{productId}")
-    public ResponseEntity<ProductResponse> getProduct(@PathVariable Long productId) {
-        return new ResponseEntity<>(productService.getProduct(productId), HttpStatus.OK);
-    }
+
 
     @PutMapping("/{productId}")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long productId,
