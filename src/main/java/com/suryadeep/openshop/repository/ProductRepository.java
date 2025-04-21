@@ -1,6 +1,5 @@
 package com.suryadeep.openshop.repository;
 
-import com.suryadeep.openshop.dto.response.ProductResponse;
 import com.suryadeep.openshop.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
