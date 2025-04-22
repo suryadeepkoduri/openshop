@@ -21,8 +21,8 @@ public class Cart {
     @Transient
     private Double price;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @OneToOne(mappedBy = "cart")
     private User user;
+
 
 }

@@ -96,7 +96,7 @@ public class UserServiceImpl implements UserService {
         addressRepository.delete(address);
     }
 
-    private User getCurrentAuthenticatedUser() {
+    public User getCurrentAuthenticatedUser() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
         return userRepository.findByEmail(userDetails.getUsername())

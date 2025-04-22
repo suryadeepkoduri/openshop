@@ -5,6 +5,7 @@ import com.suryadeep.openshop.dto.request.UserRegisterRequest;
 import com.suryadeep.openshop.dto.response.AddressResponse;
 import com.suryadeep.openshop.dto.response.UserResponse;
 import com.suryadeep.openshop.entity.Address;
+import com.suryadeep.openshop.entity.User;
 
 import java.util.List;
 
@@ -16,4 +17,5 @@ public interface UserService {
     public AddressResponse addAddress(AddressRequest addressRequest);
     public AddressResponse updateUserAddress(Long id,AddressRequest addressRequest);
     public void deleteUserAddress(Long id);
+    public User getCurrentAuthenticatedUser();
 }

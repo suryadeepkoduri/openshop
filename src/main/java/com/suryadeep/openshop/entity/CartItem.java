@@ -16,7 +16,7 @@ public class CartItem {
     @ManyToOne
     @JoinColumn(name = "variant_id")
     private Variant variant;
-    private Long quantity;
+    private int quantity;
 
     @ManyToOne
     @JoinColumn(name = "cart_id")

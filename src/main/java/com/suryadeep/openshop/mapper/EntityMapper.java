@@ -49,4 +49,19 @@ public interface EntityMapper {
     @Mapping(target = "username",source = "name")
     UserResponse toUserResponse(User user);
 
+    @Mapping(target = "variant.id", source = "variantId")
+    @Mapping(target = "cart", ignore = true)
+    @Mapping(target = "price", ignore = true)
+    CartItem toCartItemEntity(CartItemRequest cartItemRequest);
+
+    @Mapping(target = "variantId", source = "variant.id")
+    @Mapping(target = "quantity", source = "quantity")
+    CartItemResponse toCartItemResponse(CartItem cartItem);
+
+    @Mapping(target = "cartItems",source = "cartItems")
+    @Mapping(target = "price", source = "price")
+    CartResponse toResponse(Cart cart);
+
+    List<CartResponse> toResponseList(List<Cart> carts);
+
 }

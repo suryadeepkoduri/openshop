@@ -8,4 +8,5 @@ public interface AuthenticationService {
 
     @Transactional
     User registerUser(UserRegisterRequest registerRequest);
+
 }
