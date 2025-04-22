@@ -8,6 +8,8 @@ import com.suryadeep.openshop.mapper.EntityMapper;
 import com.suryadeep.openshop.repository.CategoryRepository;
 import com.suryadeep.openshop.service.CategoryService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,5 +60,11 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(CategoryNotFoundException::new);
         categoryRepository.delete(category);
+    }
+
+    @Override
+    public Page<CategoryResponse> findAllPaginated(int page, int size) {
+        return categoryRepository.findAll(PageRequest.of(page,size))
+                .map(entityMapper::toCategoryResponse);
     }
 }

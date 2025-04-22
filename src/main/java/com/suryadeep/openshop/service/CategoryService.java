@@ -3,6 +3,7 @@ package com.suryadeep.openshop.service;
 import com.suryadeep.openshop.dto.request.CategoryRequest;
 import com.suryadeep.openshop.dto.response.CategoryResponse;
 import com.suryadeep.openshop.exception.CategoryNotFoundException;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,4 +15,6 @@ public interface CategoryService {
     public CategoryResponse createCategory(CategoryRequest categoryRequest);
     public CategoryResponse updateCategory(CategoryRequest categoryRequest,Long categoryId) throws CategoryNotFoundException;
     public void deleteCategoryById(Long id) throws CategoryNotFoundException;
+
+    public Page<CategoryResponse> findAllPaginated(int page, int size);
 }

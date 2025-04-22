@@ -38,5 +38,15 @@ public interface EntityMapper {
 
     List<CategoryResponse> toCategoryResponseList(List<Category> categories);
 
+    // ===================== Address =====================
+    Address toAddressEntity(AddressRequest request);
+    AddressResponse toAddressResponse(Address address);
+    List<AddressResponse> toAddressResponseList(List<Address> addresses);
+
+    // ===================== User =====================
+    @Mapping(target = "name",source = "username")
+    User toUserEntity(UserRegisterRequest request);
+    @Mapping(target = "username",source = "name")
+    UserResponse toUserResponse(User user);
 
 }
