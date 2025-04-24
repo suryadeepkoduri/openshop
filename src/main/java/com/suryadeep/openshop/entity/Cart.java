@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
@@ -12,14 +13,16 @@ import java.util.List;
 @Entity
 public class Cart {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cart_sequence")
+    @SequenceGenerator(name = "cart_sequence", sequenceName = "cart_seq", initialValue = 1, allocationSize = 1)
+    @Column(nullable = false, updatable = false)
     private Long id;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems;
 
     @Transient
-    private Double price;
+    private BigDecimal price;
 
     @OneToOne(mappedBy = "cart")
     private User user;

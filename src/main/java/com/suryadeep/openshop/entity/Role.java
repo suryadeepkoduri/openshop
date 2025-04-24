@@ -10,8 +10,9 @@ import lombok.Setter;
 @Entity
 public class Role {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "role_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_sequence")
+    @SequenceGenerator(name = "role_sequence", sequenceName = "role_seq", initialValue = 1, allocationSize = 1)
+    @Column(nullable = false, updatable = false,name = "role_id")
     private Long roleId;
     private String roleName;
 }

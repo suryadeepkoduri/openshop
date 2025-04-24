@@ -3,10 +3,11 @@ package com.suryadeep.openshop.dto.response;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Data
-public class CartResponse {
-    private List<CartItemResponse> cartItems;
+public class OrderItemResponse {
+    private Long id;
+    private VariantResponse variant;
+    private int quantity;
     private BigDecimal price;
 }

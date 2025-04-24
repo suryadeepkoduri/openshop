@@ -4,7 +4,6 @@ import lombok.Data;
 
 @Data
 public class AddressRequest {
-    Long id;
     String addressLine;
     String city;
     String state;

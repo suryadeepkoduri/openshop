@@ -17,8 +17,9 @@ import java.util.Set;
 @Entity
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(nullable = false)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "address_sequence")
+    @SequenceGenerator(name = "address_sequence", sequenceName = "address_seq", initialValue = 1, allocationSize = 1)
+    @Column(nullable = false, updatable = false)
     private Long id;
     private String name;
     @Column(nullable = false, unique = true)

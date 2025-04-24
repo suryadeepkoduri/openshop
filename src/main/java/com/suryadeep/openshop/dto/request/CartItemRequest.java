@@ -9,3 +9,4 @@ public class CartItemRequest {
     @Min(value = 1, message = "Quantity should be greater than 0")
     private int quantity;
 }
+

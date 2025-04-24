@@ -47,6 +47,7 @@ public interface EntityMapper {
     @Mapping(target = "name",source = "username")
     User toUserEntity(UserRegisterRequest request);
     @Mapping(target = "username",source = "name")
+    @Mapping(target = "userId", source = "id")
     UserResponse toUserResponse(User user);
 
     @Mapping(target = "variant.id", source = "variantId")

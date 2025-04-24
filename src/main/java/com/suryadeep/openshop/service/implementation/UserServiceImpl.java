@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
     public AddressResponse updateUserAddress(Long id, AddressRequest updatedAddress) {
         User user = getCurrentAuthenticatedUser();
         Address existingAddress = user.getAddresses().stream()
-                .filter(addr -> addr.getId().equals(updatedAddress.getId()))
+                .filter(addr -> addr.getId().equals(id))
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("Address not found"));
 
