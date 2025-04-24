@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -39,7 +41,8 @@ public class CategoryControllerTest {
         category2.setId(2L);
         category2.setName("Category 2");
 
-        List<CategoryResponse> categories = Arrays.asList(category1, category2);
+        List<CategoryResponse> categoryList = Arrays.asList(category1, category2);
+        Page<CategoryResponse> categories = new PageImpl<>(categoryList);
 
         when(categoryService.findAllPaginated(0, 10)).thenReturn(categories);
 

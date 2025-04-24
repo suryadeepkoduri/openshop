@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -44,7 +46,19 @@ public class UserServiceTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        // Mock SecurityContext
+        var authentication = mock(Authentication.class);
+        var securityContext = mock(SecurityContext.class);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(new org.springframework.security.core.userdetails.User(
+                "john.doe@example.com", "password", new ArrayList<>()
+        ));
+
+        SecurityContextHolder.setContext(securityContext);
     }
+
 
     @Test
     public void testGetCurrentUser() {

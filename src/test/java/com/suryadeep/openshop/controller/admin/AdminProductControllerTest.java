@@ -1,7 +1,9 @@
 package com.suryadeep.openshop.controller.admin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.suryadeep.openshop.controller.GlobalExceptionHandler;
 import com.suryadeep.openshop.dto.request.ProductRequest;
+import com.suryadeep.openshop.dto.request.VariantRequest;
 import com.suryadeep.openshop.dto.response.ProductResponse;
 import com.suryadeep.openshop.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,9 +12,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+
+import java.util.ArrayList;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -33,13 +37,22 @@ public class AdminProductControllerTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(adminProductController).build();
+        this.mockMvc = MockMvcBuilders
+       .standaloneSetup(adminProductController)
+       .setControllerAdvice(new GlobalExceptionHandler()) // Add any exception handlers
+       .setValidator(new LocalValidatorFactoryBean()) // Add validator for @Valid
+       .build();
     }
 
     @Test
     public void testAddProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         ProductResponse productResponse = new ProductResponse();
+
+        productRequest.setName("Test Product");
+        productRequest.setDescription("Test Product Description");
+        productRequest.setCategoryId(1L);
+        productRequest.setVariants(new ArrayList<VariantRequest>());
 
         when(productService.addProduct(any(ProductRequest.class))).thenReturn(productResponse);
 
@@ -53,6 +66,11 @@ public class AdminProductControllerTest {
     public void testUpdateProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         ProductResponse productResponse = new ProductResponse();
+
+        productRequest.setName("Test Product");
+        productRequest.setDescription("Test Product Description");
+        productRequest.setCategoryId(1L);
+        productRequest.setVariants(new ArrayList<VariantRequest>());
 
         when(productService.updateProduct(any(ProductRequest.class), anyLong())).thenReturn(productResponse);
 

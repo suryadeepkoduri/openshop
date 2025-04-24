@@ -42,12 +42,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setRoles(Set.of(defaultRole));
 
         Cart cart = new Cart();
-
         user.setCart(cart);
 
-        User createdUser = userRepository.save(user);
-        cart.setUser(createdUser);
-        cartRepository.save(cart);
-        return createdUser;
+        return userRepository.save(user);
     }
 }

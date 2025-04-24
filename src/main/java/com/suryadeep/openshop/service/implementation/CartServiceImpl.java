@@ -69,6 +69,10 @@ public class CartServiceImpl implements CartService {
         User user = userService.getCurrentAuthenticatedUser();
         Cart cart = user.getCart();
 
+        if (cart.getCartItems() == null || cart.getCartItems().isEmpty()) {
+            throw new IllegalStateException("Cart is empty. Cannot remove item from cart.");
+        }
+
         cart.getCartItems().removeIf(item -> item.getId().equals(cartItemId));
         cartRepository.save(cart);
     }

@@ -9,6 +9,7 @@ import com.suryadeep.openshop.entity.User;
 import com.suryadeep.openshop.entity.Variant;
 import com.suryadeep.openshop.exception.ResourceNotFoundException;
 import com.suryadeep.openshop.mapper.EntityMapper;
+import com.suryadeep.openshop.repository.CartItemRepository;
 import com.suryadeep.openshop.repository.CartRepository;
 import com.suryadeep.openshop.repository.ProductRepository;
 import com.suryadeep.openshop.repository.VariantRepository;
@@ -19,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -42,6 +44,9 @@ public class CartServiceTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private CartItemRepository cartItemRepository;
 
     @InjectMocks
     private CartServiceImpl cartService;
@@ -82,6 +87,7 @@ public class CartServiceTest {
 
         when(userService.getCurrentAuthenticatedUser()).thenReturn(user);
         when(variantRepository.findById(1L)).thenReturn(Optional.of(variant));
+        when(cartItemRepository.save(any(CartItem.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(cartRepository.save(any(Cart.class))).thenReturn(cart);
         when(entityMapper.toCartItemResponse(any(CartItem.class))).thenReturn(new CartItemResponse());
 
@@ -126,14 +132,18 @@ public class CartServiceTest {
         Cart cart = new Cart();
         CartItem cartItem = new CartItem();
         cartItem.setId(1L);
-        cart.setCartItems(Collections.singletonList(cartItem));
+
+        // Use a mutable ArrayList instead of singletonList
+        cart.setCartItems(new ArrayList<>(Collections.singletonList(cartItem)));
         user.setCart(cart);
 
         when(userService.getCurrentAuthenticatedUser()).thenReturn(user);
         when(cartRepository.save(any(Cart.class))).thenReturn(cart);
 
+        // Call the method to remove the item
         cartService.removeItemFromCart(1L);
 
+        // Verify that the cart items list is empty after removal
         assertTrue(cart.getCartItems().isEmpty());
         verify(userService, times(1)).getCurrentAuthenticatedUser();
         verify(cartRepository, times(1)).save(any(Cart.class));

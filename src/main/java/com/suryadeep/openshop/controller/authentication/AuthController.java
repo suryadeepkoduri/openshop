@@ -81,7 +81,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<Object> authenticateUser(
         @Parameter(description = "Login credentials", required = true) 
-        @Valid @RequestBody LoginRequest loginRequest) {
+        @Valid @RequestBody LoginRequest loginRequest) throws Exception {
         // AuthenticationManager handles UserNotFound, BadCredentials automatically
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(

@@ -11,6 +11,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -69,12 +71,16 @@ public class OrderControllerTest {
 
     @Test
     public void testGetUserOrders() {
-        when(orderService.getUserOrders()).thenReturn(anyList());
+        OrderResponse order1 = new OrderResponse(); // you can set fields if needed
+        OrderResponse order2 = new OrderResponse();
+        List<OrderResponse> mockOrders = List.of(order1, order2);
+
+        when(orderService.getUserOrders()).thenReturn(mockOrders);
 
         ResponseEntity<Object> responseEntity = orderController.getUserOrders();
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals(anyList(), responseEntity.getBody());
+        assertEquals(mockOrders, responseEntity.getBody());
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.suryadeep.openshop.controller;
 
 import com.suryadeep.openshop.dto.request.CartItemRequest;
+import com.suryadeep.openshop.dto.response.CartItemResponse;
 import com.suryadeep.openshop.dto.response.CartResponse;
 import com.suryadeep.openshop.service.CartService;
 import org.junit.jupiter.api.BeforeEach;

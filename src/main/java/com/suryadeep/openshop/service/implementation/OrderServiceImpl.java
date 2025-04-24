@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,16 +59,20 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setVariant(cartItem.getVariant());
             orderItem.setQuantity(cartItem.getQuantity());
 
-            // Assuming price is fetched from the variant.
+            // Ensure variant is not null before proceeding
+            if (cartItem.getVariant() == null) {
+                throw new IllegalStateException("Cart item variant is missing. Cannot proceed with order creation.");
+            }
+
             BigDecimal itemPrice = cartItem.getVariant().getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
             orderItem.setPrice(itemPrice);
 
-             totalItemPrice[0] = totalItemPrice[0].add(itemPrice);
+            totalItemPrice[0] = totalItemPrice[0].add(itemPrice);
             return orderItem;
         }).collect(Collectors.toList()));
 
         // Step 5: Calculate tax and shipping price.
-        BigDecimal taxAmount = totalItemPrice[0].multiply  (BigDecimal.valueOf(0.05)); // Assuming 5% tax
+        BigDecimal taxAmount = totalItemPrice[0].multiply(BigDecimal.valueOf(0.05)); // Assuming 5% tax
         BigDecimal shippingPrice = BigDecimal.valueOf(150); // Flat shipping price
 
         // Step 6: Finalize order totals.
@@ -75,13 +80,15 @@ public class OrderServiceImpl implements OrderService {
         order.setTaxAmount(taxAmount);
         order.setShippingPrice(shippingPrice);
         order.setTotalPrice(totalItemPrice[0].add(taxAmount).add(shippingPrice));
-        Address shippingAddress = addressRepository.findById(orderRequest.getShippingAddressId()).
-                orElseThrow(() -> new ResourceNotFoundException("Address Not Found"));
+        Address shippingAddress = addressRepository.findById(orderRequest.getShippingAddressId())
+                .orElseThrow(() -> new ResourceNotFoundException("Address Not Found"));
         order.setShippingAddress(shippingAddress);
-        //TODO call payment
+        //TODO: Handle payment logic
 
         // Step 7: Save the order and clear the cart.
         Order savedOrder = orderRepository.save(order);
+        // Make the list modifiable before clearing
+        cart.setCartItems(new ArrayList<>(cart.getCartItems()));
         cart.getCartItems().clear();
         cartRepository.save(cart);
 
