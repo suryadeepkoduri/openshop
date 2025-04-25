@@ -39,6 +39,8 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class AuthController {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     private final AuthenticationService authenticationService;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
@@ -64,7 +66,6 @@ public class AuthController {
             log.info("User successfully registered with email: {}", registerRequest.getEmail());
             return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.fromUser(registerUser));
         } catch (EmailAlreadyExistsException e) {
-            log.warn("Registration failed: Email already exists: {}", registerRequest.getEmail());
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             log.error("Unexpected error during user registration for email: {}", registerRequest.getEmail(), e);

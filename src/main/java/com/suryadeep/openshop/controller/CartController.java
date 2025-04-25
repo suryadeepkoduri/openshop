@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/cart")
 @Tag(name = "Cart", description = "Shopping cart management APIs")
 public class CartController {
+
+    private static final Logger logger = LoggerFactory.getLogger(CartController.class);
 
     private final CartService cartService;
 
@@ -33,6 +37,7 @@ public class CartController {
     })
     @GetMapping("")
     public ResponseEntity<Object> getCart() {
+        logger.info("Fetching user's cart");
         return ResponseEntity.ok(cartService.getCart());
     }
 
@@ -51,6 +56,7 @@ public class CartController {
     public ResponseEntity<Object> addCartItem(
         @Parameter(description = "Cart item details", required = true) 
         @RequestBody CartItemRequest cartItemRequest) {
+        logger.info("Adding item to cart: {}", cartItemRequest.getVariantId());
         return ResponseEntity.ok(cartService.addItemToCart(cartItemRequest));
     }
 
@@ -71,6 +77,7 @@ public class CartController {
         @RequestBody CartItemRequest cartItemRequest,
         @Parameter(description = "ID of the cart item to update", required = true) 
         @PathVariable Long cartItemId) {
+        logger.info("Updating cart item with ID: {}", cartItemId);
         return ResponseEntity.ok(cartService.updateItemInCart(cartItemRequest, cartItemId));
     }
 
@@ -88,6 +95,7 @@ public class CartController {
     public ResponseEntity<Object> removeCartItem(
         @Parameter(description = "ID of the cart item to remove", required = true) 
         @PathVariable Long cartItemId) {
+        logger.info("Removing cart item with ID: {}", cartItemId);
         cartService.removeItemFromCart(cartItemId);
         return new ResponseEntity<>("Deleted Successfully", HttpStatus.NO_CONTENT);
     }
