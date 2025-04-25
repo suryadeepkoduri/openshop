@@ -1,6 +1,7 @@
 package com.suryadeep.openshop.config;
 
 
+import com.suryadeep.openshop.filter.MdcFilter;
 import com.suryadeep.openshop.security.JwtAuthenticationFilter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ public class SecurityConfig {
 
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final MdcFilter mdcFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, Environment environment) throws Exception {
@@ -51,6 +53,7 @@ public class SecurityConfig {
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource(environment)))
                 .authenticationProvider(authenticationProvider)
+                .addFilterBefore(mdcFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         log.info("Security filter chain configured successfully");
