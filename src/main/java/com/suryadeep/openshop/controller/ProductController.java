@@ -10,19 +10,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/products")
 @Tag(name = "Product", description = "Product management APIs")
 public class ProductController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
     private final ProductService productService;
 
@@ -40,7 +38,7 @@ public class ProductController {
         @Parameter(description = "Number of items per page") @RequestParam(defaultValue = "10") int size,
         @Parameter(description = "Category ID to filter products") @RequestParam(required = false) Long categoryId) {
 
-        logger.info("Fetching products with page: {}, size: {}, and categoryId: {}", page, size, categoryId);
+        log.info("Fetching products with page: {}, size: {}, and categoryId: {}", page, size, categoryId);
 
         if (categoryId != null) {
             return new ResponseEntity<>(productService.findByCategoryPaginated(categoryId, page, size), HttpStatus.OK);
@@ -63,7 +61,7 @@ public class ProductController {
     public ResponseEntity<ProductResponse> getProduct(
         @Parameter(description = "ID of the product to retrieve", required = true) 
         @PathVariable Long productId) {
-        logger.info("Fetching product with ID: {}", productId);
+        log.info("Fetching product with ID: {}", productId);
         return new ResponseEntity<>(productService.getProduct(productId), HttpStatus.OK);
     }
     //TODO Add Image to product

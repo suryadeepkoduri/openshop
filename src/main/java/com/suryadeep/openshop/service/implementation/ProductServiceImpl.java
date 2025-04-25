@@ -26,8 +26,6 @@ import java.util.List;
 @Slf4j
 public class ProductServiceImpl implements ProductService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
-
     private final EntityMapper entityMapper;
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;

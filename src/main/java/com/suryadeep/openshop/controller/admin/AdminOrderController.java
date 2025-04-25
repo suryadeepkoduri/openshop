@@ -11,18 +11,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/admin/orders")
 @Tag(name = "Admin - Orders", description = "Order management APIs for administrators")
 public class AdminOrderController {
-
-    private static final Logger logger = LoggerFactory.getLogger(AdminOrderController.class);
 
     private final OrderService orderService;
 
@@ -46,7 +44,7 @@ public class AdminOrderController {
         @PathVariable Long orderId, 
         @Parameter(description = "New status for the order", required = true) 
         @RequestBody OrderStatus status) {
-        logger.info("Updating order status for order ID: {}", orderId);
+        log.info("Updating order status for order ID: {}", orderId);
         return ResponseEntity.ok(orderService.updateOrderStatus(orderId, status));
     }
 
@@ -68,7 +66,7 @@ public class AdminOrderController {
         @PathVariable Long orderId,
         @Parameter(description = "Payment ID to verify", required = true) 
         @PathVariable String paymentId) {
-        logger.info("Verifying payment for order ID: {} with payment ID: {}", orderId, paymentId);
+        log.info("Verifying payment for order ID: {} with payment ID: {}", orderId, paymentId);
         return ResponseEntity.ok("need to implement");
     }
 
@@ -86,7 +84,7 @@ public class AdminOrderController {
     public ResponseEntity<Object> getOrders(
         @Parameter(description = "Page number (zero-based)") @RequestParam(defaultValue = "0") int page,
         @Parameter(description = "Number of items per page") @RequestParam(defaultValue = "10") int size) {
-        logger.info("Fetching orders with page: {} and size: {}", page, size);
+        log.info("Fetching orders with page: {} and size: {}", page, size);
         return ResponseEntity.ok(orderService.getOrders(page, size));
     }
 
@@ -106,7 +104,7 @@ public class AdminOrderController {
         @RequestParam OrderStatus orderStatus,
         @Parameter(description = "Page number (zero-based)") @RequestParam(defaultValue = "0") int page,
         @Parameter(description = "Number of items per page") @RequestParam(defaultValue = "10") int size) {
-        logger.info("Fetching orders with status: {}, page: {}, and size: {}", orderStatus, page, size);
+        log.info("Fetching orders with status: {}, page: {}, and size: {}", orderStatus, page, size);
         return ResponseEntity.ok(orderService.getOrdersByStatus(orderStatus, page, size));
     }
 }

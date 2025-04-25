@@ -12,8 +12,7 @@ import com.suryadeep.openshop.repository.OrderRepository;
 import com.suryadeep.openshop.service.OrderService;
 import com.suryadeep.openshop.service.UserService;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,12 +24,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @AllArgsConstructor
 @Service
 @Transactional
 public class OrderServiceImpl implements OrderService {
-
-    private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
     private final UserService userService; 
     private final CartRepository cartRepository;
@@ -40,12 +38,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponse createOrder(OrderRequest orderRequest) {
-        logger.info("Creating order for user with shipping address ID: {}", orderRequest.getShippingAddressId());
+        log.info("Creating order for user with shipping address ID: {}", orderRequest.getShippingAddressId());
 
         User user = userService.getCurrentAuthenticatedUser();
         Cart cart = user.getCart();
         if (cart == null || cart.getCartItems().isEmpty()) {
-            logger.error("Cart is empty. Cannot create an order.");
+            log.error("Cart is empty. Cannot create an order.");
             throw new IllegalStateException("Cart is empty. Cannot create an order.");
         }
 
@@ -62,7 +60,7 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setQuantity(cartItem.getQuantity());
 
             if (cartItem.getVariant() == null) {
-                logger.error("Cart item variant is missing. Cannot proceed with order creation.");
+                log.error("Cart item variant is missing. Cannot proceed with order creation.");
                 throw new IllegalStateException("Cart item variant is missing. Cannot proceed with order creation.");
             }
 
@@ -89,13 +87,13 @@ public class OrderServiceImpl implements OrderService {
         cart.getCartItems().clear();
         cartRepository.save(cart);
 
-        logger.info("Order created successfully with ID: {}", savedOrder.getId());
+        log.info("Order created successfully with ID: {}", savedOrder.getId());
         return orderMapper.toResponse(savedOrder);
     }
 
     @Override
     public OrderResponse getOrder(Long orderId) {
-        logger.info("Fetching order with ID: {}", orderId);
+        log.info("Fetching order with ID: {}", orderId);
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
         return orderMapper.toResponse(order);
@@ -105,13 +103,13 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderResponse> getUserOrders() {
         User user = userService.getCurrentAuthenticatedUser();
         if (user == null) {
-            logger.error("Current authenticated user not found.");
+            log.error("Current authenticated user not found.");
             throw new IllegalStateException("Current authenticated user not found.");
         }
 
         List<Order> orders = orderRepository.findByUserId(user.getId());
         if (orders == null || orders.isEmpty()) {
-            logger.info("No orders found for user with ID: {}", user.getId());
+            log.info("No orders found for user with ID: {}", user.getId());
             return Collections.emptyList();
         }
 
@@ -120,7 +118,7 @@ public class OrderServiceImpl implements OrderService {
                     try {
                         return orderMapper.toResponse(order);
                     } catch (Exception e) {
-                        logger.error("Failed to map order to response", e);
+                        log.error("Failed to map order to response", e);
                         throw new IllegalStateException("Failed to map order to response", e);
                     }
                 }).collect(Collectors.toList());
@@ -129,7 +127,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderResponse> getUserOrdersByStatus(OrderStatus status) {
         User user = userService.getCurrentAuthenticatedUser();
-        logger.info("Fetching orders for user with ID: {} and status: {}", user.getId(), status);
+        log.info("Fetching orders for user with ID: {} and status: {}", user.getId(), status);
         return orderRepository.findByUserAndStatus(user, status)
                 .stream()
                 .map(orderMapper::toResponse)
@@ -138,59 +136,59 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderResponse> getOrdersByStatus(OrderStatus status, int page, int size) {
-        logger.info("Fetching orders with status: {}, page: {}, and size: {}", status, page, size);
+        log.info("Fetching orders with status: {}, page: {}, and size: {}", status, page, size);
         return orderRepository.findByStatus(status, Pageable.ofSize(size).withPage(page)).map(orderMapper::toResponse);
     }
 
     @Override
     public Page<OrderResponse> getOrders(int page, int size) {
-        logger.info("Fetching orders with page: {} and size: {}", page, size);
+        log.info("Fetching orders with page: {} and size: {}", page, size);
         return orderRepository.findAll(Pageable.ofSize(size).withPage(page)).map(orderMapper::toResponse);
     }
 
     @Override
     public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
-        logger.info("Updating order status for order ID: {} to {}", orderId, newStatus);
+        log.info("Updating order status for order ID: {} to {}", orderId, newStatus);
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
         if (!OrderStatus.contains(String.valueOf(newStatus))) {
-            logger.error("Invalid order status: {}", newStatus);
+            log.error("Invalid order status: {}", newStatus);
             throw new IllegalArgumentException("Invalid order status: " + newStatus);
         }
         order.setStatus(newStatus);
         orderRepository.save(order);
-        logger.info("Order status updated successfully for order ID: {}", orderId);
+        log.info("Order status updated successfully for order ID: {}", orderId);
         return orderMapper.toResponse(order);
     }
 
     @Override
     public String cancelOrder(Long orderId) {
-        logger.info("Cancelling order with ID: {}", orderId);
+        log.info("Cancelling order with ID: {}", orderId);
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
         if (OrderStatus.CANCELLED.equals(order.getStatus())) {
-            logger.warn("Order is already canceled.");
+            log.warn("Order is already canceled.");
             throw new IllegalStateException("Order is already canceled.");
         }
         if (OrderStatus.SHIPPED.equals(order.getStatus())) {
-            logger.warn("Order is already shipped. Cannot cancel.");
+            log.warn("Order is already shipped. Cannot cancel.");
             throw new IllegalStateException("Order is already shipped. Cannot cancel.");
         }
         order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
-        logger.info("Order canceled successfully with ID: {}", orderId);
+        log.info("Order canceled successfully with ID: {}", orderId);
         return "Order canceled successfully!";
     }
 
     @Override
     public boolean verifyPayment(String paymentRefNo) {
-        logger.info("Verifying payment with reference number: {}", paymentRefNo);
+        log.info("Verifying payment with reference number: {}", paymentRefNo);
         return paymentRefNo != null && paymentRefNo.startsWith("TXN");
     }
 
     @Override
     public byte[] downloadInvoice(Long orderId) {
-        logger.info("Downloading invoice for order with ID: {}", orderId);
+        log.info("Downloading invoice for order with ID: {}", orderId);
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
         String invoiceText = "Invoice for Order #: " + order.getOrderNumber() + "\n"

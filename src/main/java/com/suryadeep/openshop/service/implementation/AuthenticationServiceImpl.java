@@ -11,8 +11,7 @@ import com.suryadeep.openshop.repository.RoleRepository;
 import com.suryadeep.openshop.repository.UserRepository;
 import com.suryadeep.openshop.service.AuthenticationService;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,9 +20,8 @@ import java.util.Set;
 
 @AllArgsConstructor
 @Service
+@Slf4j
 public class AuthenticationServiceImpl implements AuthenticationService {
-
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -32,10 +30,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Transactional
     public User registerUser(UserRegisterRequest registerRequest) throws EmailAlreadyExistsException {
-        logger.info("Registering new user with email: {}", registerRequest.getEmail());
+        log.info("Registering new user with email: {}", registerRequest.getEmail());
 
         if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
-            logger.error("Email already exists: {}", registerRequest.getEmail());
+            log.error("Email already exists: {}", registerRequest.getEmail());
             throw new EmailAlreadyExistsException("Email is already in use");
         }
 
@@ -53,7 +51,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setCart(cart);
 
         User savedUser = userRepository.save(user);
-        logger.info("User registered successfully with email: {}", registerRequest.getEmail());
+        log.info("User registered successfully with email: {}", registerRequest.getEmail());
         return savedUser;
     }
 }

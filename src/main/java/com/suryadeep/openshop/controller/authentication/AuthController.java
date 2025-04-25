@@ -39,8 +39,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class AuthController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-
     private final AuthenticationService authenticationService;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;

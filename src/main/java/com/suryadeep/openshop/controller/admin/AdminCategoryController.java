@@ -11,19 +11,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/admin/categories")
 @Tag(name = "Admin - Categories", description = "Category management APIs for administrators")
 public class AdminCategoryController {
-
-    private static final Logger logger = LoggerFactory.getLogger(AdminCategoryController.class);
 
     private final CategoryService categoryService;
 
@@ -44,7 +42,7 @@ public class AdminCategoryController {
     public ResponseEntity<CategoryResponse> addCategory(
         @Parameter(description = "Category details", required = true) 
         @RequestBody CategoryRequest categoryRequest) {
-        logger.info("Adding new category: {}", categoryRequest.getName());
+        log.info("Adding new category: {}", categoryRequest.getName());
         return new ResponseEntity<>(categoryService.createCategory(categoryRequest), HttpStatus.CREATED);
     }
 
@@ -68,7 +66,7 @@ public class AdminCategoryController {
         @RequestBody CategoryRequest categoryRequest, 
         @Parameter(description = "ID of the category to update", required = true) 
         @PathVariable Long categoryId) {
-        logger.info("Updating category with ID: {}", categoryId);
+        log.info("Updating category with ID: {}", categoryId);
         return new ResponseEntity<>(categoryService.updateCategory(categoryRequest, categoryId), HttpStatus.OK);
     }
 
@@ -88,7 +86,7 @@ public class AdminCategoryController {
     public ResponseEntity<String> deleteCategory(
         @Parameter(description = "ID of the category to delete", required = true) 
         @PathVariable Long categoryId) {
-        logger.info("Deleting category with ID: {}", categoryId);
+        log.info("Deleting category with ID: {}", categoryId);
         categoryService.deleteCategoryById(categoryId);
         return new ResponseEntity<>("Category deleted successfully", HttpStatus.NO_CONTENT);
     }
