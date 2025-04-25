@@ -19,6 +19,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,6 +38,8 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Authentication", description = "Authentication APIs for user registration and login")
 @SecurityRequirements  // No security requirements for auth endpoints
 public class AuthController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     private final AuthenticationService authenticationService;
     private final AuthenticationManager authenticationManager;
@@ -56,12 +60,16 @@ public class AuthController {
     public ResponseEntity<Object> registerUser(
         @Parameter(description = "User registration details", required = true) 
         @Valid @RequestBody UserRegisterRequest registerRequest) {
+        logger.info("Registering new user with email: {}", registerRequest.getEmail());
         try {
             User registerUser = authenticationService.registerUser(registerRequest);
+            logger.info("User registered successfully with email: {}", registerRequest.getEmail());
             return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.fromUser(registerUser));
         } catch (EmailAlreadyExistsException e) {
+            logger.error("Email already exists: {}", registerRequest.getEmail(), e);
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
+            logger.error("An unexpected error occurred during user registration", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred");
         }
     }
@@ -82,6 +90,7 @@ public class AuthController {
     public ResponseEntity<Object> authenticateUser(
         @Parameter(description = "Login credentials", required = true) 
         @Valid @RequestBody LoginRequest loginRequest) throws Exception {
+        logger.info("Authenticating user with email: {}", loginRequest.getEmail());
         // AuthenticationManager handles UserNotFound, BadCredentials automatically
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -94,6 +103,7 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         String jwtToken = jwtService.generateToken(userDetails);
+        logger.info("User authenticated successfully with email: {}", loginRequest.getEmail());
 
         return ResponseEntity.ok(new LoginResponse(jwtToken));
     }
