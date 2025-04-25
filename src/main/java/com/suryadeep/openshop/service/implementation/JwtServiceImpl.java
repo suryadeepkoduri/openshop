@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
+@Slf4j
 public class JwtServiceImpl implements JwtService {
     @Value("${security.jwt.secret-key}")
     private String secretKey;
@@ -26,11 +28,13 @@ public class JwtServiceImpl implements JwtService {
     // Generating Token
     @Override
     public String generateToken(UserDetails userDetails) {
+        log.debug("Generating token for user: {}", userDetails.getUsername());
         return generateToken(new HashMap<>(),userDetails);
     }
 
     @Override
     public String generateToken(Map<String, Object> extraClaims,UserDetails userDetails) {
+        log.debug("Generating token with extra claims for user: {}", userDetails.getUsername());
         return buildToken(extraClaims,userDetails,expirationTime);
     }
 
@@ -39,7 +43,13 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public boolean isTokenValid(String token,UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        boolean isValid = (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        if (isValid) {
+            log.debug("Token is valid for user: {}", username);
+        } else {
+            log.warn("Token validation failed for user: {}", username);
+        }
+        return isValid;
     }
 
     @Override
@@ -54,16 +64,26 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts
-                .parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        try {
+            return Jwts
+                    .parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (Exception e) {
+            log.error("Error parsing JWT token: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        Date expirationDate = extractExpiration(token);
+        boolean isExpired = expirationDate.before(new Date());
+        if (isExpired) {
+            log.debug("Token is expired. Expiration date: {}", expirationDate);
+        }
+        return isExpired;
     }
 
     private Date extractExpiration(String token) {
@@ -75,12 +95,17 @@ public class JwtServiceImpl implements JwtService {
             UserDetails userDetails,
             long expiration
     ) {
+        Date issuedAt = new Date(System.currentTimeMillis());
+        Date expirationDate = new Date(System.currentTimeMillis() + expiration);
+        log.debug("Building token for user: {}. Issued at: {}, Expires at: {}", 
+                 userDetails.getUsername(), issuedAt, expirationDate);
+
         return Jwts
                 .builder()
                 .claims(extraClaims)
                 .subject(userDetails.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .issuedAt(issuedAt)
+                .expiration(expirationDate)
                 .signWith(getSigningKey())
                 .compact();
     }
