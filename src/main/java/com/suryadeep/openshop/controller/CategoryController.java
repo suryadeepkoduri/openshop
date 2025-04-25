@@ -10,10 +10,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/categories")
@@ -35,6 +37,7 @@ public class CategoryController {
             @Parameter(description = "Page number (zero-based)") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Number of items per page") @RequestParam(defaultValue = "10") int size
     ) {
+        log.info("Fetching all categories with page: {} and size: {}", page, size);
         return new ResponseEntity<>(categoryService.findAllPaginated(page,size), HttpStatus.OK);
     }
 
@@ -53,6 +56,7 @@ public class CategoryController {
     public ResponseEntity<CategoryResponse> getCategoryById(
         @Parameter(description = "ID of the category to retrieve", required = true) 
         @PathVariable Long categoryId) {
+        log.info("Fetching category with ID: {}", categoryId);
         return new ResponseEntity<>(categoryService.getCategoryById(categoryId),HttpStatus.OK);
     }
 }

@@ -13,10 +13,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/users")
@@ -38,6 +40,7 @@ public class UserController {
     })
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser() {
+        log.info("Fetching current user profile");
         return ResponseEntity.ok(userService.getCurrentUser());
     }
 
@@ -57,6 +60,7 @@ public class UserController {
     public ResponseEntity<UserResponse> updateCurrentUser(
         @Parameter(description = "Updated user information", required = true) 
         @RequestBody UserRegisterRequest userRequest){
+        log.info("Updating current user profile");
         return ResponseEntity.ok(userService.updateCurrentUser(userRequest));
     }
 
@@ -73,6 +77,7 @@ public class UserController {
     })
     @GetMapping("/me/addresses")
     public ResponseEntity<Object> getAddress() {
+        log.info("Fetching addresses for the current user");
         return ResponseEntity.ok(userService.getAddressess());
     }
 
@@ -92,6 +97,7 @@ public class UserController {
     public ResponseEntity<Object> addAddress(
         @Parameter(description = "Address details", required = true) 
         @RequestBody AddressRequest addressRequest) {
+        log.info("Adding new address for the current user");
         return new ResponseEntity<>(userService.addAddress(addressRequest), HttpStatus.CREATED);
     }
 
@@ -115,6 +121,7 @@ public class UserController {
         @PathVariable Long id,
         @Parameter(description = "Updated address details", required = true) 
         @RequestBody AddressRequest addressRequest){
+        log.info("Updating address with ID: {}", id);
         return ResponseEntity.ok(userService.updateUserAddress(id,addressRequest));
     }
 
@@ -133,6 +140,7 @@ public class UserController {
     public ResponseEntity<Object> deleteUserAddress(
         @Parameter(description = "ID of the address to delete", required = true) 
         @PathVariable Long id) {
+        log.info("Deleting address with ID: {}", id);
         userService.deleteUserAddress(id);
         return new ResponseEntity<>("Address deleted successfully", HttpStatus.NO_CONTENT);
     }

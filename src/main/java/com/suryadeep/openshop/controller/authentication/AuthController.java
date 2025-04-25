@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 @Tag(name = "Authentication", description = "Authentication APIs for user registration and login")
 @SecurityRequirements  // No security requirements for auth endpoints
+@Slf4j
 public class AuthController {
 
     private final AuthenticationService authenticationService;
@@ -56,12 +58,15 @@ public class AuthController {
     public ResponseEntity<Object> registerUser(
         @Parameter(description = "User registration details", required = true) 
         @Valid @RequestBody UserRegisterRequest registerRequest) {
+        log.info("Received registration request for email: {}", registerRequest.getEmail());
         try {
             User registerUser = authenticationService.registerUser(registerRequest);
+            log.info("User successfully registered with email: {}", registerRequest.getEmail());
             return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.fromUser(registerUser));
         } catch (EmailAlreadyExistsException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
+            log.error("Unexpected error during user registration for email: {}", registerRequest.getEmail(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred");
         }
     }
@@ -82,20 +87,27 @@ public class AuthController {
     public ResponseEntity<Object> authenticateUser(
         @Parameter(description = "Login credentials", required = true) 
         @Valid @RequestBody LoginRequest loginRequest) throws Exception {
-        // AuthenticationManager handles UserNotFound, BadCredentials automatically
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
-                        loginRequest.getPassword()
-                )
-        );
+        log.info("Login attempt for user: {}", loginRequest.getEmail());
+        try {
+            // AuthenticationManager handles UserNotFound, BadCredentials automatically
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getEmail(),
+                            loginRequest.getPassword()
+                    )
+            );
 
-        // If authentication is successful, SecurityContext is updated
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        String jwtToken = jwtService.generateToken(userDetails);
+            // If authentication is successful, SecurityContext is updated
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            String jwtToken = jwtService.generateToken(userDetails);
 
-        return ResponseEntity.ok(new LoginResponse(jwtToken));
+            log.info("User successfully authenticated: {}", loginRequest.getEmail());
+            return ResponseEntity.ok(new LoginResponse(jwtToken));
+        } catch (Exception e) {
+            log.warn("Authentication failed for user: {}", loginRequest.getEmail(), e);
+            throw e; // Re-throw to let Spring Security handle the response
+        }
     }
 
 

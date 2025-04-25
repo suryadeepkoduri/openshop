@@ -18,7 +18,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-public class ProductControllerTest {
+class ProductControllerTest {
 
     @Mock
     private ProductService productService;
@@ -27,13 +27,13 @@ public class ProductControllerTest {
     private ProductController productController;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
 
     @Test
-    public void testGetAllProducts() {
+    void testGetAllProducts() {
         List<ProductResponse> productList = Arrays.asList(new ProductResponse(), new ProductResponse());
         Page<ProductResponse> productPage = new PageImpl<>(productList);
 
@@ -47,7 +47,7 @@ public class ProductControllerTest {
 
 
     @Test
-    public void testGetProductById() {
+    void testGetProductById() {
         Long productId = 1L;
         ProductResponse productResponse = new ProductResponse();
         when(productService.getProduct(productId)).thenReturn(productResponse);
@@ -59,27 +59,15 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void testGetProductsByCategory() {
+    void testGetProductsByCategory() {
         Long categoryId = 1L;
         List<ProductResponse> products = Arrays.asList(new ProductResponse(), new ProductResponse());
         Page<ProductResponse> productPage = new PageImpl<>(products);
-        when(productService.findByCategoryPaginated(categoryId,0,10)).thenReturn(productPage);
+        when(productService.findByCategoryPaginated(categoryId, 0, 10)).thenReturn(productPage);
 
         ResponseEntity<Object> response = productController.getProducts(0, 10, categoryId);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(productPage, response.getBody());
     }
-
-//    @Test
-//    public void testSearchProducts() {
-//        String query = "laptop";
-//        List<ProductResponse> products = Arrays.asList(new ProductResponse(), new ProductResponse());
-//        when(productService.searchProducts(query)).thenReturn(products);
-//
-//        ResponseEntity<Object> response = productController.searchProducts(query);
-//
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        assertEquals(products, response.getBody());
-//    }
 }

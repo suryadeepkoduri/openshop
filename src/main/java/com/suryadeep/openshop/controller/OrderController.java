@@ -11,10 +11,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/orders")
@@ -40,6 +42,7 @@ public class OrderController {
     public ResponseEntity<Object> createOrder(
         @Parameter(description = "Order details", required = true) 
         @RequestBody OrderRequest orderRequest){
+        log.info("Creating new order for user with shipping address ID: {}", orderRequest.getShippingAddressId());
         return ResponseEntity.ok(orderService.createOrder(orderRequest));
     }
 
@@ -60,6 +63,7 @@ public class OrderController {
     public ResponseEntity<Object> getOrder(
         @Parameter(description = "ID of the order to retrieve", required = true) 
         @PathVariable Long orderId){
+        log.info("Fetching order with ID: {}", orderId);
         return ResponseEntity.ok(orderService.getOrder(orderId));
     }
 
@@ -79,6 +83,7 @@ public class OrderController {
     public ResponseEntity<Object> cancelOrder(
         @Parameter(description = "ID of the order to cancel", required = true) 
         @PathVariable Long orderId){
+        log.info("Cancelling order with ID: {}", orderId);
         return new ResponseEntity<>(orderService.cancelOrder(orderId), HttpStatus.NO_CONTENT);
     }
 
@@ -93,6 +98,7 @@ public class OrderController {
     })
     @GetMapping("")
     public ResponseEntity<Object> getUserOrders(){
+        log.info("Fetching orders for the current authenticated user");
         return ResponseEntity.ok(orderService.getUserOrders());
     }
 
@@ -111,6 +117,7 @@ public class OrderController {
     public ResponseEntity<Object> downloadInvoice(
         @Parameter(description = "ID of the order to download invoice for", required = true) 
         @PathVariable Long orderId){
+        log.info("Downloading invoice for order with ID: {}", orderId);
         return ResponseEntity.ok(orderService.downloadInvoice(orderId));
     }
 }

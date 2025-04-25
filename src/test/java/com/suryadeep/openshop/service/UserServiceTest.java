@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class UserServiceTest {
+class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -43,7 +43,7 @@ public class UserServiceTest {
     private UserServiceImpl userService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
 
         // Mock SecurityContext
@@ -60,7 +60,7 @@ public class UserServiceTest {
 
 
     @Test
-    public void testGetCurrentUser() {
+    void testGetCurrentUser() {
         User mockUser = new User();
         mockUser.setId(1L);
         mockUser.setName("John Doe");
@@ -77,7 +77,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testGetCurrentUser_UserNotFound() {
+    void testGetCurrentUser_UserNotFound() {
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> userService.getCurrentUser());
@@ -88,7 +88,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testGetCurrentUser_NullPrincipal() {
+    void testGetCurrentUser_NullPrincipal() {
         var securityContext = SecurityContextHolder.getContext();
         when(securityContext.getAuthentication().getPrincipal()).thenReturn(null);
 
@@ -100,7 +100,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testUpdateCurrentUser() {
+    void testUpdateCurrentUser() {
         User mockUser = new User();
         mockUser.setId(1L);
         mockUser.setName("John Doe");
@@ -122,7 +122,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testGetAddressess() {
+    void testGetAddressess() {
         User mockUser = new User();
         mockUser.setId(1L);
         mockUser.setName("John Doe");
@@ -140,7 +140,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testAddAddress() {
+    void testAddAddress() {
         User mockUser = new User();
         mockUser.setId(1L);
         mockUser.setName("John Doe");
@@ -165,7 +165,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testUpdateUserAddress() {
+    void testUpdateUserAddress() {
         User mockUser = new User();
         mockUser.setId(1L);
         mockUser.setName("John Doe");
@@ -191,7 +191,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testDeleteUserAddress() {
+    void testDeleteUserAddress() {
         User mockUser = new User();
         mockUser.setId(1L);
         mockUser.setName("John Doe");

@@ -18,7 +18,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-public class CategoryControllerTest {
+class CategoryControllerTest {
 
     @Mock
     private CategoryService categoryService;
@@ -27,12 +27,12 @@ public class CategoryControllerTest {
     private CategoryController categoryController;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testGetAllCategories() {
+    void testGetAllCategories() {
         CategoryResponse category1 = new CategoryResponse();
         category1.setId(1L);
         category1.setName("Category 1");
@@ -53,7 +53,7 @@ public class CategoryControllerTest {
     }
 
     @Test
-    public void testGetCategoryById() {
+    void testGetCategoryById() {
         CategoryResponse category = new CategoryResponse();
         category.setId(1L);
         category.setName("Category 1");

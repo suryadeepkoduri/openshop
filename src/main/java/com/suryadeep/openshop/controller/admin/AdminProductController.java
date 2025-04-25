@@ -12,15 +12,18 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/admin/products")
 @Tag(name = "Admin - Products", description = "Product management APIs for administrators")
 public class AdminProductController {
+
     private final ProductService productService;
 
     @Operation(
@@ -41,6 +44,7 @@ public class AdminProductController {
     public ResponseEntity<ProductResponse> addProduct(
         @Parameter(description = "Product details including variants", required = true) 
         @Valid @RequestBody ProductRequest productRequest) {
+        log.info("Adding new product: {}", productRequest.getName());
         return new ResponseEntity<>(productService.addProduct(productRequest), HttpStatus.CREATED);
     }
 
@@ -65,6 +69,7 @@ public class AdminProductController {
         @PathVariable Long productId,
         @Parameter(description = "Updated product details", required = true) 
         @Valid @RequestBody ProductRequest productRequest) {
+        log.info("Updating product with ID: {}", productId);
         return new ResponseEntity<>(productService.updateProduct(productRequest,productId),HttpStatus.OK);
     }
 
@@ -84,9 +89,8 @@ public class AdminProductController {
     public ResponseEntity<String> deleteProduct(
         @Parameter(description = "ID of the product to delete", required = true) 
         @PathVariable Long productId) {
+        log.info("Deleting product with ID: {}", productId);
         productService.deleteProduct(productId);
         return new ResponseEntity<>("Product deleted successfully", HttpStatus.NO_CONTENT);
     }
-
-
 }

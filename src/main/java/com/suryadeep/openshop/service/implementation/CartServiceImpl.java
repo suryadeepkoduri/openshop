@@ -14,24 +14,27 @@ import com.suryadeep.openshop.repository.VariantRepository;
 import com.suryadeep.openshop.service.CartService;
 import com.suryadeep.openshop.service.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Slf4j
 @AllArgsConstructor
 @Service
 public class CartServiceImpl implements CartService {
+    
     private final UserService userService;
     private final EntityMapper entityMapper;
     private final VariantRepository variantRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
 
-
     @Override
     public CartResponse getCart() {
         User user = userService.getCurrentAuthenticatedUser();
         Cart cart = user.getCart();
+        log.info("Fetching cart for user with ID: {}", user.getId());
         return entityMapper.toResponse(cart);
     }
 
@@ -39,6 +42,7 @@ public class CartServiceImpl implements CartService {
     public CartItemResponse addItemToCart(CartItemRequest cartItemRequest) {
         User user = userService.getCurrentAuthenticatedUser();
         Cart cart = user.getCart();
+        log.info("Adding item to cart for user with ID: {}", user.getId());
 
         if (cart.getCartItems() != null && !cart.getCartItems().isEmpty()) {
             Optional<CartItem> existingCartItem = cart.getCartItems().stream()
@@ -48,6 +52,7 @@ public class CartServiceImpl implements CartService {
             if (existingCartItem.isPresent()) {
                 CartItem cartItem = existingCartItem.get();
                 cartItem.setQuantity(cartItemRequest.getQuantity());
+                log.info("Updated quantity for existing cart item with ID: {}", cartItem.getId());
                 return entityMapper.toCartItemResponse(cartItem);
             }
         }
@@ -60,6 +65,7 @@ public class CartServiceImpl implements CartService {
         CartItem savedCartItem = cartItemRepository.save(newCartItem);
         cart.getCartItems().add(savedCartItem);
         cartRepository.save(cart);
+        log.info("Added new cart item with ID: {}", savedCartItem.getId());
 
         return entityMapper.toCartItemResponse(savedCartItem);
     }
@@ -68,19 +74,23 @@ public class CartServiceImpl implements CartService {
     public void removeItemFromCart(Long cartItemId) {
         User user = userService.getCurrentAuthenticatedUser();
         Cart cart = user.getCart();
+        log.info("Removing item from cart for user with ID: {}", user.getId());
 
         if (cart.getCartItems() == null || cart.getCartItems().isEmpty()) {
+            log.warn("Cart is empty. Cannot remove item from cart.");
             throw new IllegalStateException("Cart is empty. Cannot remove item from cart.");
         }
 
         cart.getCartItems().removeIf(item -> item.getId().equals(cartItemId));
         cartRepository.save(cart);
+        log.info("Removed cart item with ID: {}", cartItemId);
     }
 
     @Override
     public CartItemResponse updateItemInCart(CartItemRequest cartItemRequest, Long cartItemId) {
         User user = userService.getCurrentAuthenticatedUser();
         Cart cart = user.getCart();
+        log.info("Updating item in cart for user with ID: {}", user.getId());
 
         CartItem cartItem = cart.getCartItems().stream()
                 .filter(item -> item.getId().equals(cartItemId))
@@ -90,6 +100,7 @@ public class CartServiceImpl implements CartService {
         cartItem.setQuantity(cartItemRequest.getQuantity());
         cartItemRepository.save(cartItem);
         cartRepository.save(cart);
+        log.info("Updated cart item with ID: {}", cartItemId);
 
         return entityMapper.toCartItemResponse(cartItem);
     }

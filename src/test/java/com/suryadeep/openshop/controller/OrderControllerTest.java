@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class OrderControllerTest {
+class OrderControllerTest {
 
     @Mock
     private OrderService orderService;
@@ -26,12 +26,12 @@ public class OrderControllerTest {
     private OrderController orderController;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testCreateOrder() {
+    void testCreateOrder() {
         OrderRequest orderRequest = new OrderRequest();
         OrderResponse orderResponse = new OrderResponse();
 
@@ -44,7 +44,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    public void testGetOrder() {
+    void testGetOrder() {
         Long orderId = 1L;
         OrderResponse orderResponse = new OrderResponse();
 
@@ -57,7 +57,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    public void testCancelOrder() {
+    void testCancelOrder() {
         Long orderId = 1L;
         String cancelMessage = "Order cancelled successfully";
 
@@ -70,7 +70,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    public void testGetUserOrders() {
+    void testGetUserOrders() {
         OrderResponse order1 = new OrderResponse(); // you can set fields if needed
         OrderResponse order2 = new OrderResponse();
         List<OrderResponse> mockOrders = List.of(order1, order2);
@@ -84,7 +84,7 @@ public class OrderControllerTest {
     }
 
     @Test
-    public void testDownloadInvoice() {
+    void testDownloadInvoice() {
         Long orderId = 1L;
         byte[] invoice = new byte[0];
 

@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class UserControllerTest {
+class UserControllerTest {
 
     @Mock
     private UserService userService;
@@ -29,12 +29,12 @@ public class UserControllerTest {
     private UserController userController;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testGetCurrentUser() {
+    void testGetCurrentUser() {
         UserResponse userResponse = new UserResponse();
         when(userService.getCurrentUser()).thenReturn(userResponse);
 
@@ -45,7 +45,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testUpdateCurrentUser() {
+    void testUpdateCurrentUser() {
         UserRegisterRequest userRequest = new UserRegisterRequest();
         UserResponse userResponse = new UserResponse();
         when(userService.updateCurrentUser(any(UserRegisterRequest.class))).thenReturn(userResponse);
@@ -57,7 +57,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testGetAddress() {
+    void testGetAddress() {
         List<AddressResponse> addressResponses = Collections.singletonList(new AddressResponse());
         when(userService.getAddressess()).thenReturn(addressResponses);
 
@@ -68,7 +68,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testAddAddress() {
+    void testAddAddress() {
         AddressRequest addressRequest = new AddressRequest();
         AddressResponse addressResponse = new AddressResponse();
         when(userService.addAddress(any(AddressRequest.class))).thenReturn(addressResponse);
@@ -80,7 +80,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testUpdateUserAddress() {
+    void testUpdateUserAddress() {
         Long addressId = 1L;
         AddressRequest addressRequest = new AddressRequest();
         AddressResponse addressResponse = new AddressResponse();
@@ -93,7 +93,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testDeleteUserAddress() {
+    void testDeleteUserAddress() {
         Long addressId = 1L;
 
         doNothing().when(userService).deleteUserAddress(addressId);

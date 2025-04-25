@@ -4,7 +4,6 @@ import com.suryadeep.openshop.dto.request.OrderRequest;
 import com.suryadeep.openshop.dto.response.OrderResponse;
 import com.suryadeep.openshop.entity.enums.OrderStatus;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 

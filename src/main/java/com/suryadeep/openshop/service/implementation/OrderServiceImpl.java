@@ -12,6 +12,7 @@ import com.suryadeep.openshop.repository.OrderRepository;
 import com.suryadeep.openshop.service.OrderService;
 import com.suryadeep.openshop.service.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @AllArgsConstructor
 @Service
 @Transactional
@@ -34,24 +36,24 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper orderMapper;
     private final AddressRepository addressRepository;
 
+    private static final String ORDER_NOT_FOUND_MSG = "Order with ID %s not found";
+
     @Override
     public OrderResponse createOrder(OrderRequest orderRequest) {
-        // Step 1: Get the current authenticated user.
-        User user = userService.getCurrentAuthenticatedUser();
+        log.info("Creating order for user with shipping address ID: {}", orderRequest.getShippingAddressId());
 
-        // Step 2: Get the user's cart.
+        User user = userService.getCurrentAuthenticatedUser();
         Cart cart = user.getCart();
         if (cart == null || cart.getCartItems().isEmpty()) {
+            log.error("Cart is empty. Cannot create an order.");
             throw new IllegalStateException("Cart is empty. Cannot create an order.");
         }
 
-        // Step 3: Initialize the order and its details.
         Order order = new Order();
         order.setUser(user);
         order.setPaymentMethod(orderRequest.getPaymentMethod());
         order.setOrderNotes(orderRequest.getOrderNotes());
 
-        // Step 4: Calculate order totals and map cart items to order items.
         final BigDecimal[] totalItemPrice = {BigDecimal.ZERO};
         order.setOrderItems(cart.getCartItems().stream().map(cartItem -> {
             OrderItem orderItem = new OrderItem();
@@ -59,8 +61,8 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setVariant(cartItem.getVariant());
             orderItem.setQuantity(cartItem.getQuantity());
 
-            // Ensure variant is not null before proceeding
             if (cartItem.getVariant() == null) {
+                log.error("Cart item variant is missing. Cannot proceed with order creation.");
                 throw new IllegalStateException("Cart item variant is missing. Cannot proceed with order creation.");
             }
 
@@ -69,13 +71,11 @@ public class OrderServiceImpl implements OrderService {
 
             totalItemPrice[0] = totalItemPrice[0].add(itemPrice);
             return orderItem;
-        }).collect(Collectors.toList()));
+        }).toList());
 
-        // Step 5: Calculate tax and shipping price.
-        BigDecimal taxAmount = totalItemPrice[0].multiply(BigDecimal.valueOf(0.05)); // Assuming 5% tax
-        BigDecimal shippingPrice = BigDecimal.valueOf(150); // Flat shipping price
+        BigDecimal taxAmount = totalItemPrice[0].multiply(BigDecimal.valueOf(0.05));
+        BigDecimal shippingPrice = BigDecimal.valueOf(150);
 
-        // Step 6: Finalize order totals.
         order.setTotalItemPrice(totalItemPrice[0]);
         order.setTaxAmount(taxAmount);
         order.setShippingPrice(shippingPrice);
@@ -83,23 +83,21 @@ public class OrderServiceImpl implements OrderService {
         Address shippingAddress = addressRepository.findById(orderRequest.getShippingAddressId())
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Address with ID %s not found", orderRequest.getShippingAddressId())));
         order.setShippingAddress(shippingAddress);
-        //TODO: Handle payment logic
 
-        // Step 7: Save the order and clear the cart.
         Order savedOrder = orderRepository.save(order);
-        // Make the list modifiable before clearing
         cart.setCartItems(new ArrayList<>(cart.getCartItems()));
         cart.getCartItems().clear();
         cartRepository.save(cart);
 
-        // Return order response.
+        log.info("Order created successfully with ID: {}", savedOrder.getId());
         return orderMapper.toResponse(savedOrder);
     }
 
     @Override
     public OrderResponse getOrder(Long orderId) {
+        log.info("Fetching order with ID: {}", orderId);
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(String.format(ORDER_NOT_FOUND_MSG, orderId))));
         return orderMapper.toResponse(order);
     }
 
@@ -107,11 +105,13 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderResponse> getUserOrders() {
         User user = userService.getCurrentAuthenticatedUser();
         if (user == null) {
+            log.error("Current authenticated user not found.");
             throw new IllegalStateException("Current authenticated user not found.");
         }
 
         List<Order> orders = orderRepository.findByUserId(user.getId());
         if (orders == null || orders.isEmpty()) {
+            log.info("No orders found for user with ID: {}", user.getId());
             return Collections.emptyList();
         }
 
@@ -120,67 +120,79 @@ public class OrderServiceImpl implements OrderService {
                     try {
                         return orderMapper.toResponse(order);
                     } catch (Exception e) {
+                        log.error("Failed to map order to response", e);
                         throw new IllegalStateException("Failed to map order to response", e);
                     }
-                }).collect(Collectors.toList());
+                }).toList();
     }
 
     @Override
     public List<OrderResponse> getUserOrdersByStatus(OrderStatus status) {
         User user = userService.getCurrentAuthenticatedUser();
+        log.info("Fetching orders for user with ID: {} and status: {}", user.getId(), status);
         return orderRepository.findByUserAndStatus(user, status)
                 .stream()
                 .map(orderMapper::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
-    public Page<OrderResponse> getOrdersByStatus(OrderStatus status, int page,int size) {
+    public Page<OrderResponse> getOrdersByStatus(OrderStatus status, int page, int size) {
+        log.info("Fetching orders with status: {}, page: {}, and size: {}", status, page, size);
         return orderRepository.findByStatus(status, Pageable.ofSize(size).withPage(page)).map(orderMapper::toResponse);
     }
 
     @Override
     public Page<OrderResponse> getOrders(int page, int size) {
+        log.info("Fetching orders with page: {} and size: {}", page, size);
         return orderRepository.findAll(Pageable.ofSize(size).withPage(page)).map(orderMapper::toResponse);
     }
 
-
     @Override
     public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
+        log.info("Updating order status for order ID: {} to {}", orderId, newStatus);
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
-        if(!OrderStatus.contains(String.valueOf(newStatus))) throw new IllegalArgumentException("Invalid order status: " + newStatus);
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ORDER_NOT_FOUND_MSG, orderId)));
+        if (!OrderStatus.contains(String.valueOf(newStatus))) {
+            log.error("Invalid order status: {}", newStatus);
+            throw new IllegalArgumentException("Invalid order status: " + newStatus);
+        }
         order.setStatus(newStatus);
         orderRepository.save(order);
+        log.info("Order status updated successfully for order ID: {}", orderId);
         return orderMapper.toResponse(order);
     }
 
     @Override
     public String cancelOrder(Long orderId) {
+        log.info("Cancelling order with ID: {}", orderId);
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
         if (OrderStatus.CANCELLED.equals(order.getStatus())) {
+            log.warn("Order is already canceled.");
             throw new IllegalStateException("Order is already canceled.");
         }
-        if(OrderStatus.SHIPPED.equals(order.getStatus())){
+        if (OrderStatus.SHIPPED.equals(order.getStatus())) {
+            log.warn("Order is already shipped. Cannot cancel.");
             throw new IllegalStateException("Order is already shipped. Cannot cancel.");
         }
         order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
+        log.info("Order canceled successfully with ID: {}", orderId);
         return "Order canceled successfully!";
     }
 
     @Override
     public boolean verifyPayment(String paymentRefNo) {
-        // Placeholder implementation for payment verification.
+        log.info("Verifying payment with reference number: {}", paymentRefNo);
         return paymentRefNo != null && paymentRefNo.startsWith("TXN");
     }
 
-    
     @Override
     public byte[] downloadInvoice(Long orderId) {
+        log.info("Downloading invoice for order with ID: {}", orderId);
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ORDER_NOT_FOUND_MSG, orderId)));
         String invoiceText = "Invoice for Order #: " + order.getOrderNumber() + "\n"
                            + "Total: " + order.getTotalPrice() + " " + order.getCurrencyCode();
         return invoiceText.getBytes();

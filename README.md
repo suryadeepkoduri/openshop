@@ -9,6 +9,7 @@ OpenShop is a RESTful e-commerce API built with Spring Boot. It provides endpoin
 - Shopping cart functionality
 - Order processing
 - Admin-specific endpoints
+- Enhanced logging with MDC (Mapped Diagnostic Context)
 
 ## Getting Started
 
@@ -38,6 +39,8 @@ http://localhost:8080/swagger-ui/index.html
 
 For detailed information about the API documentation, please see the [Swagger Documentation Guide](docs/swagger-documentation.md).
 
+For information about the MDC implementation and usage, please see the [MDC Usage Guide](docs/mdc-usage.md).
+
 ## Technologies Used
 
 - Spring Boot 3.3.8
@@ -48,6 +51,7 @@ For detailed information about the API documentation, please see the [Swagger Do
 - Lombok
 - MapStruct
 - Swagger/OpenAPI
+- SLF4J/Logback with MDC
 
 ## Project Structure
 
@@ -58,6 +62,8 @@ For detailed information about the API documentation, please see the [Swagger Do
 - `dto`: Data transfer objects
 - `config`: Application configuration
 - `security`: Authentication and authorization
+- `filter`: Request filters including MDC filter
+- `util`: Utility classes including MDC utilities
 
 ## License
 

@@ -1,8 +1,10 @@
 package com.suryadeep.openshop.config;
 
 
+import com.suryadeep.openshop.filter.MdcFilter;
 import com.suryadeep.openshop.security.JwtAuthenticationFilter;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -19,6 +21,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
+@Slf4j
 @AllArgsConstructor
 @Configuration
 @EnableWebSecurity
@@ -26,9 +29,12 @@ public class SecurityConfig {
 
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final MdcFilter mdcFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, Environment environment) throws Exception {
+        log.info("Configuring security filter chain");
+
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
@@ -47,7 +53,10 @@ public class SecurityConfig {
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource(environment)))
                 .authenticationProvider(authenticationProvider)
+                .addFilterBefore(mdcFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        log.info("Security filter chain configured successfully");
 
         return http.build();
     }
