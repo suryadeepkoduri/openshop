@@ -5,6 +5,7 @@ import com.suryadeep.openshop.entity.Cart;
 import com.suryadeep.openshop.entity.Role;
 import com.suryadeep.openshop.entity.User;
 import com.suryadeep.openshop.exception.EmailAlreadyExistsException;
+import com.suryadeep.openshop.exception.ResourceNotFoundException;
 import com.suryadeep.openshop.repository.CartRepository;
 import com.suryadeep.openshop.repository.RoleRepository;
 import com.suryadeep.openshop.repository.UserRepository;
@@ -38,16 +39,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         // Set default role for new user
         Role defaultRole = roleRepository.findByRoleName("USER")
-                .orElseThrow(() -> new RuntimeException("User role not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Role USER not found"));
         user.setRoles(Set.of(defaultRole));
 
         Cart cart = new Cart();
-
         user.setCart(cart);
 
-        User createdUser = userRepository.save(user);
-        cart.setUser(createdUser);
-        cartRepository.save(cart);
-        return createdUser;
+        return userRepository.save(user);
     }
 }

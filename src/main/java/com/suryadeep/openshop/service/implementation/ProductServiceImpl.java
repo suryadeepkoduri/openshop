@@ -5,6 +5,7 @@ import com.suryadeep.openshop.dto.response.ProductResponse;
 import com.suryadeep.openshop.entity.Category;
 import com.suryadeep.openshop.entity.Product;
 import com.suryadeep.openshop.entity.Variant;
+import com.suryadeep.openshop.exception.CategoryNotFoundException;
 import com.suryadeep.openshop.exception.ProductNotFoundException;
 import com.suryadeep.openshop.mapper.EntityMapper;
 import com.suryadeep.openshop.repository.CategoryRepository;
@@ -33,7 +34,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = entityMapper.toProductEntity(productRequest);
 
         Category category = categoryRepository.findById(productRequest.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new CategoryNotFoundException(String.format("Category with ID %s not found", productRequest.getCategoryId())));
         product.setCategory(category);
 
         if (productRequest.getVariants() != null) {

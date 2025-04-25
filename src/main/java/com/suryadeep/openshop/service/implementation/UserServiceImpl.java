@@ -99,6 +99,9 @@ public class UserServiceImpl implements UserService {
     public User getCurrentAuthenticatedUser() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
+        if (userDetails == null) {
+            throw new IllegalStateException("Principal cannot be null");
+        }
         return userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
     }

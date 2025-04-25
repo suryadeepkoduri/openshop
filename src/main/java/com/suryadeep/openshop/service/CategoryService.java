@@ -10,11 +10,11 @@ import java.util.List;
 
 @Service
 public interface CategoryService {
-    public List<CategoryResponse> getAllCategories();
-    public CategoryResponse getCategoryById(Long id) throws CategoryNotFoundException;
-    public CategoryResponse createCategory(CategoryRequest categoryRequest);
-    public CategoryResponse updateCategory(CategoryRequest categoryRequest,Long categoryId) throws CategoryNotFoundException;
-    public void deleteCategoryById(Long id) throws CategoryNotFoundException;
+    List<CategoryResponse> getAllCategories();
+    CategoryResponse getCategoryById(Long id) throws CategoryNotFoundException;
+    CategoryResponse createCategory(CategoryRequest categoryRequest);
+    CategoryResponse updateCategory(CategoryRequest categoryRequest,Long categoryId) throws CategoryNotFoundException;
+    void deleteCategoryById(Long id) throws CategoryNotFoundException;
 
-    public Page<CategoryResponse> findAllPaginated(int page, int size);
+    Page<CategoryResponse> findAllPaginated(int page, int size);
 }
