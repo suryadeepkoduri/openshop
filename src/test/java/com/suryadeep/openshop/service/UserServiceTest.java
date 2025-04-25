@@ -10,6 +10,7 @@ import com.suryadeep.openshop.mapper.EntityMapper;
 import com.suryadeep.openshop.repository.AddressRepository;
 import com.suryadeep.openshop.repository.UserRepository;
 import com.suryadeep.openshop.service.implementation.UserServiceImpl;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -18,9 +19,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -75,6 +74,29 @@ public class UserServiceTest {
         assertNotNull(userResponse);
         verify(userRepository, times(1)).findByEmail(anyString());
         verify(entityMapper, times(1)).toUserResponse(any(User.class));
+    }
+
+    @Test
+    public void testGetCurrentUser_UserNotFound() {
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> userService.getCurrentUser());
+
+        assertEquals("User not found", exception.getMessage());
+        verify(userRepository, times(1)).findByEmail(anyString());
+        verify(entityMapper, never()).toUserResponse(any(User.class));
+    }
+
+    @Test
+    public void testGetCurrentUser_NullPrincipal() {
+        var securityContext = SecurityContextHolder.getContext();
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(null);
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> userService.getCurrentUser());
+
+        assertEquals("Principal cannot be null", exception.getMessage());
+        verify(userRepository, never()).findByEmail(anyString());
+        verify(entityMapper, never()).toUserResponse(any(User.class));
     }
 
     @Test

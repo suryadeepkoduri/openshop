@@ -56,7 +56,7 @@ public class CartServiceImpl implements CartService {
         newCartItem.setCart(cart);
         newCartItem.setQuantity(cartItemRequest.getQuantity());
         newCartItem.setVariant(variantRepository.findById(cartItemRequest.getVariantId())
-                .orElseThrow(() -> new ResourceNotFoundException("Variant not found")));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Variant with ID %s not found", cartItemRequest.getVariantId()))));
         CartItem savedCartItem = cartItemRepository.save(newCartItem);
         cart.getCartItems().add(savedCartItem);
         cartRepository.save(cart);

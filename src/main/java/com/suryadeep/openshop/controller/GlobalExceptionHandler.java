@@ -19,4 +19,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleBadCredentials(BadCredentialsException ex) {
         return new ResponseEntity<>("Authentication failed - Bad credentials", HttpStatus.UNAUTHORIZED);
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Object> handleRuntimeException(Exception ex) {
+        return new ResponseEntity<>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

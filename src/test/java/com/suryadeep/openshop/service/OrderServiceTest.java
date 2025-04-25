@@ -4,6 +4,7 @@
     import com.suryadeep.openshop.dto.response.OrderResponse;
     import com.suryadeep.openshop.entity.*;
     import com.suryadeep.openshop.entity.enums.OrderStatus;
+    import com.suryadeep.openshop.exception.ResourceNotFoundException;
     import com.suryadeep.openshop.mapper.OrderMapper;
     import com.suryadeep.openshop.repository.AddressRepository;
     import com.suryadeep.openshop.repository.CartRepository;
@@ -81,6 +82,79 @@
 
             assertNotNull(response);
             verify(cartRepository, times(1)).save(cart);
+        }
+
+        @Test
+        void testCreateOrderWithInvalidShippingAddress() {
+            User user = new User();
+            Cart cart = new Cart();
+
+            CartItem cartItem = new CartItem();
+            Variant variant = new Variant();
+            variant.setPrice(BigDecimal.valueOf(400));
+            cartItem.setVariant(variant);
+            cartItem.setQuantity(1);
+
+            cart.setCartItems(Collections.singletonList(cartItem));
+            user.setCart(cart);
+
+            OrderRequest orderRequest = new OrderRequest();
+            orderRequest.setShippingAddressId(999L); // Invalid ID
+
+            when(userService.getCurrentAuthenticatedUser()).thenReturn(user);
+            when(addressRepository.findById(999L)).thenReturn(Optional.empty());
+
+            assertThrows(ResourceNotFoundException.class, () -> orderService.createOrder(orderRequest));
+            verify(addressRepository, times(1)).findById(anyLong());
+        }
+
+        @Test
+        void testCreateOrderWithEmptyCart() {
+            User user = new User();
+            Cart cart = new Cart();
+
+            cart.setCartItems(Collections.emptyList());
+            user.setCart(cart);
+
+            OrderRequest orderRequest = new OrderRequest();
+
+            when(userService.getCurrentAuthenticatedUser()).thenReturn(user);
+
+            assertThrows(IllegalStateException.class, () -> orderService.createOrder(orderRequest));
+            verify(userService, times(1)).getCurrentAuthenticatedUser();
+        }
+
+        @Test
+        void testCreateOrderWithNullCartVariant() {
+            User user = new User();
+            Cart cart = new Cart();
+
+            CartItem cartItem = new CartItem();
+            cartItem.setVariant(null); // Null variant
+            cartItem.setQuantity(1);
+
+            cart.setCartItems(Collections.singletonList(cartItem));
+            user.setCart(cart);
+
+            OrderRequest orderRequest = new OrderRequest();
+
+            when(userService.getCurrentAuthenticatedUser()).thenReturn(user);
+
+            assertThrows(IllegalStateException.class, () -> orderService.createOrder(orderRequest));
+            verify(userService, times(1)).getCurrentAuthenticatedUser();
+        }
+
+        @Test
+        void testCreateOrderWithNoCartAssignedToUser() {
+            User user = new User();
+            user.setCart(null); // No cart assigned
+
+            OrderRequest orderRequest = new OrderRequest();
+
+            when(userService.getCurrentAuthenticatedUser()).thenReturn(user);
+
+            assertThrows(IllegalStateException.class, () -> orderService.createOrder(orderRequest));
+            verify(userService, times(1)).getCurrentAuthenticatedUser();
         }
 
         @Test

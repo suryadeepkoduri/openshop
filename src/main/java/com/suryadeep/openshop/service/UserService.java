@@ -11,11 +11,11 @@ import java.util.List;
 
 public interface UserService {
     
-    public UserResponse getCurrentUser();
-    public UserResponse updateCurrentUser(UserRegisterRequest userRequest);
-    public List<AddressResponse> getAddressess();
-    public AddressResponse addAddress(AddressRequest addressRequest);
-    public AddressResponse updateUserAddress(Long id,AddressRequest addressRequest);
-    public void deleteUserAddress(Long id);
-    public User getCurrentAuthenticatedUser();
+    UserResponse getCurrentUser();
+    UserResponse updateCurrentUser(UserRegisterRequest userRequest);
+    List<AddressResponse> getAddressess();
+    AddressResponse addAddress(AddressRequest addressRequest);
+    AddressResponse updateUserAddress(Long id,AddressRequest addressRequest);
+    void deleteUserAddress(Long id);
+    User getCurrentAuthenticatedUser();
 }

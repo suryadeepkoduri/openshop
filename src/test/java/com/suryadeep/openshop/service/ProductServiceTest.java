@@ -4,8 +4,7 @@ import com.suryadeep.openshop.dto.request.ProductRequest;
 import com.suryadeep.openshop.dto.response.ProductResponse;
 import com.suryadeep.openshop.entity.Category;
 import com.suryadeep.openshop.entity.Product;
-import com.suryadeep.openshop.entity.Variant;
-import com.suryadeep.openshop.exception.ProductNotFoundException;
+import com.suryadeep.openshop.exception.CategoryNotFoundException;
 import com.suryadeep.openshop.mapper.EntityMapper;
 import com.suryadeep.openshop.repository.CategoryRepository;
 import com.suryadeep.openshop.repository.ProductRepository;
@@ -69,6 +68,59 @@ class ProductServiceTest {
         ProductResponse productResponse = productService.addProduct(productRequest);
 
         assertNotNull(productResponse);
+        verify(productRepository, times(1)).save(any(Product.class));
+    }
+
+    @Test
+    void testAddProductWhenCategoryNotFound() {
+        ProductRequest productRequest = new ProductRequest();
+        productRequest.setName("Tablet");
+        productRequest.setDescription("Android Tablet");
+        productRequest.setCategoryId(99L);
+
+        when(categoryRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+
+        assertThrows(CategoryNotFoundException.class, () -> productService.addProduct(productRequest));
+
+        verify(categoryRepository, times(1)).findById(any(Long.class));
+        verify(productRepository, never()).save(any(Product.class));
+    }
+
+    @Test
+    void testAddProductWithInvalidData() {
+        ProductRequest productRequest = new ProductRequest();
+        productRequest.setName(""); // Invalid name
+        productRequest.setDescription("Invalid product");
+
+        when(entityMapper.toProductEntity(any(ProductRequest.class))).thenThrow(IllegalArgumentException.class);
+
+        assertThrows(IllegalArgumentException.class, () -> productService.addProduct(productRequest));
+
+        verify(entityMapper, times(1)).toProductEntity(any(ProductRequest.class));
+        verify(productRepository, never()).save(any(Product.class));
+    }
+
+    @Test
+    void testAddProductWhenRepositoryThrowsException() {
+        ProductRequest productRequest = new ProductRequest();
+        productRequest.setName("Phone");
+        productRequest.setDescription("Smartphone");
+        productRequest.setCategoryId(2L);
+
+        Product product = new Product();
+        product.setName("Phone");
+        product.setDescription("Smartphone");
+
+        Category category = new Category();
+        category.setId(2L);
+        category.setName("Mobiles");
+
+        when(entityMapper.toProductEntity(any(ProductRequest.class))).thenReturn(product);
+        when(categoryRepository.findById(any(Long.class))).thenReturn(Optional.of(category));
+        when(productRepository.save(any(Product.class))).thenThrow(RuntimeException.class);
+
+        assertThrows(RuntimeException.class, () -> productService.addProduct(productRequest));
+
         verify(productRepository, times(1)).save(any(Product.class));
     }
 

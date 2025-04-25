@@ -81,7 +81,7 @@ public class OrderServiceImpl implements OrderService {
         order.setShippingPrice(shippingPrice);
         order.setTotalPrice(totalItemPrice[0].add(taxAmount).add(shippingPrice));
         Address shippingAddress = addressRepository.findById(orderRequest.getShippingAddressId())
-                .orElseThrow(() -> new ResourceNotFoundException("Address Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Address with ID %s not found", orderRequest.getShippingAddressId())));
         order.setShippingAddress(shippingAddress);
         //TODO: Handle payment logic
 

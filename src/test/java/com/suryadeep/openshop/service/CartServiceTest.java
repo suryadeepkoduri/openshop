@@ -101,6 +101,61 @@ public class CartServiceTest {
     }
 
     @Test
+    public void testAddItemToCartWithNonExistentVariant() {
+        User user = new User();
+        Cart cart = new Cart();
+        user.setCart(cart);
+
+        CartItemRequest cartItemRequest = new CartItemRequest();
+        cartItemRequest.setVariantId(2L);
+        cartItemRequest.setQuantity(3);
+
+        when(userService.getCurrentAuthenticatedUser()).thenReturn(user);
+        when(variantRepository.findById(2L)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () ->
+                cartService.addItemToCart(cartItemRequest)
+        );
+
+        assertEquals("Variant with ID 2 not found", exception.getMessage());
+        verify(userService, times(1)).getCurrentAuthenticatedUser();
+        verify(variantRepository, times(1)).findById(2L);
+        verifyNoInteractions(cartRepository, entityMapper);
+    }
+
+    @Test
+    public void testAddItemToCartWithCorrectQuantity() {
+        User user = new User();
+        Cart cart = new Cart();
+        user.setCart(cart);
+
+        CartItemRequest cartItemRequest = new CartItemRequest();
+        cartItemRequest.setVariantId(3L);
+        cartItemRequest.setQuantity(5);
+
+        Variant variant = new Variant();
+        variant.setId(3L);
+        CartItem cartItem = new CartItem();
+        cartItem.setQuantity(5);
+        cartItem.setVariant(variant);
+
+        when(userService.getCurrentAuthenticatedUser()).thenReturn(user);
+        when(variantRepository.findById(3L)).thenReturn(Optional.of(variant));
+        when(cartItemRepository.save(any(CartItem.class))).thenReturn(cartItem);
+        when(cartRepository.save(any(Cart.class))).thenReturn(cart);
+        when(entityMapper.toCartItemResponse(cartItem)).thenReturn(new CartItemResponse());
+
+        CartItemResponse cartItemResponse = cartService.addItemToCart(cartItemRequest);
+
+        assertNotNull(cartItemResponse);
+        assertEquals(5, cartItem.getQuantity());
+        verify(userService, times(1)).getCurrentAuthenticatedUser();
+        verify(variantRepository, times(1)).findById(3L);
+        verify(cartRepository, times(1)).save(any(Cart.class));
+        verify(entityMapper, times(1)).toCartItemResponse(cartItem);
+    }
+
+    @Test
     public void testUpdateItemInCart() {
         User user = new User();
         Cart cart = new Cart();

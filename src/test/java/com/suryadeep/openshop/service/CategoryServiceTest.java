@@ -128,4 +128,15 @@ class CategoryServiceTest {
         assertNotNull(categoryResponse);
         verify(categoryRepository, times(1)).findById(categoryId);
     }
+
+    @Test
+    void testGetCategoryByIdThrowsCategoryNotFoundException() {
+        Long categoryId = 1L;
+
+        when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
+
+        assertThrows(CategoryNotFoundException.class, () -> categoryService.getCategoryById(categoryId));
+
+        verify(categoryRepository, times(1)).findById(categoryId);
+    }
 }
