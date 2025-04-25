@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 public class OrderResponse {
     private Long id;
-    private String paymentRefNo;;
+    private String paymentRefNo;
     private LocalDateTime orderDate;
     private String orderStatus;
     private String paymentStatus;

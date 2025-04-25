@@ -66,5 +66,4 @@ public class ProductController {
     }
     //TODO Add Image to product
     //TODO Configure refresh token in jwt service
-    //TODO Implement order functionality
 }

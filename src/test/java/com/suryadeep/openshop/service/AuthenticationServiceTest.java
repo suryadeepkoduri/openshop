@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class AuthenticationServiceTest {
+class AuthenticationServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -39,12 +39,12 @@ public class AuthenticationServiceTest {
     private AuthenticationServiceImpl authenticationService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testRegisterUser_Success() {
+    void testRegisterUser_Success() {
         // --- Arrange ---
         UserRegisterRequest request = new UserRegisterRequest();
         request.setEmail("test@example.com");
@@ -66,12 +66,10 @@ public class AuthenticationServiceTest {
         // FIX: Make save return the user object it was called with
         when(userRepository.save(any(User.class))).thenAnswer(new Answer<User>() {
             @Override
-            public User answer(InvocationOnMock invocation) throws Throwable {
+            User answer(InvocationOnMock invocation) throws Throwable {
                 return invocation.getArgument(0); // Return the first argument passed to save()
             }
         });
-        // Or using a lambda (more concise):
-        // when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
 
         // --- Act ---
@@ -96,7 +94,7 @@ public class AuthenticationServiceTest {
     }
 
     @Test
-    public void testRegisterUser_RoleNotFound() {
+    void testRegisterUser_RoleNotFound() {
         // --- Arrange ---
         UserRegisterRequest request = new UserRegisterRequest();
         request.setEmail("test@example.com");
@@ -114,7 +112,7 @@ public class AuthenticationServiceTest {
     }
 
     @Test
-    public void testRegisterUser_InvalidRequestData() {
+    void testRegisterUser_InvalidRequestData() {
         // --- Arrange ---
         UserRegisterRequest request = new UserRegisterRequest();
         request.setEmail("");
@@ -126,13 +124,13 @@ public class AuthenticationServiceTest {
     }
 
     @Test
-    public void testRegisterUser_NullRequest() {
+    void testRegisterUser_NullRequest() {
         // --- Act and Assert ---
         assertThrows(NullPointerException.class, () -> authenticationService.registerUser(null));
     }
 
     @Test
-    public void testRegisterUser_EmailAlreadyExists() {
+    void testRegisterUser_EmailAlreadyExists() {
         UserRegisterRequest request = new UserRegisterRequest();
         request.setEmail("test@example.com");
         request.setPassword("password");

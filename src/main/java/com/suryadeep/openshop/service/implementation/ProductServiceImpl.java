@@ -45,8 +45,8 @@ public class ProductServiceImpl implements ProductService {
             if (productRequest.getVariants() != null) {
                 List<Variant> variants = productRequest.getVariants().stream()
                         .map(entityMapper::toVariantEntity)
-                        .peek(variant -> variant.setProduct(product))
                         .toList();
+                variants.forEach(variant -> variant.setProduct(product));
                 product.setVariants(variants);
                 log.debug("Added {} variants to product", variants.size());
             }
@@ -84,8 +84,8 @@ public class ProductServiceImpl implements ProductService {
             if (productRequest.getVariants() != null) {
                 List<Variant> variants = productRequest.getVariants().stream()
                         .map(entityMapper::toVariantEntity)
-                        .peek(variant -> variant.setProduct(existingProduct))
                         .toList();
+                variants.forEach(variant -> variant.setProduct(existingProduct));
                 existingProduct.getVariants().clear(); // clear old variants
                 existingProduct.getVariants().addAll(variants);
                 log.debug("Updated product variants. New count: {}", variants.size());

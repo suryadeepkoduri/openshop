@@ -95,7 +95,7 @@ public class Order {
     @Version
     private Long version;
 
-    @Pattern(regexp = "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$")
+    @Pattern(regexp = "^(?:[\\d]{1,3}\\.){3}[\\d]{1,3}$")
     @Column(name = "ip_address", length = 45)
     private String ipAddress;
 

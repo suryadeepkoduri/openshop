@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class AdminProductControllerTest {
+class AdminProductControllerTest {
 
     private MockMvc mockMvc;
 
@@ -35,7 +35,7 @@ public class AdminProductControllerTest {
     private AdminProductController adminProductController;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
         this.mockMvc = MockMvcBuilders
        .standaloneSetup(adminProductController)
@@ -45,7 +45,7 @@ public class AdminProductControllerTest {
     }
 
     @Test
-    public void testAddProduct() throws Exception {
+    void testAddProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         ProductResponse productResponse = new ProductResponse();
 
@@ -63,7 +63,7 @@ public class AdminProductControllerTest {
     }
 
     @Test
-    public void testUpdateProduct() throws Exception {
+    void testUpdateProduct() throws Exception {
         ProductRequest productRequest = new ProductRequest();
         ProductResponse productResponse = new ProductResponse();
 
@@ -81,7 +81,7 @@ public class AdminProductControllerTest {
     }
 
     @Test
-    public void testDeleteProduct() throws Exception {
+    void testDeleteProduct() throws Exception {
         mockMvc.perform(delete("/api/admin/products/{productId}", 1L))
                 .andExpect(status().isNoContent());
     }

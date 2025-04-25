@@ -36,6 +36,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper orderMapper;
     private final AddressRepository addressRepository;
 
+    private static final String ORDER_NOT_FOUND_MSG = "Order with ID %s not found";
+
     @Override
     public OrderResponse createOrder(OrderRequest orderRequest) {
         log.info("Creating order for user with shipping address ID: {}", orderRequest.getShippingAddressId());
@@ -69,7 +71,7 @@ public class OrderServiceImpl implements OrderService {
 
             totalItemPrice[0] = totalItemPrice[0].add(itemPrice);
             return orderItem;
-        }).collect(Collectors.toList()));
+        }).toList());
 
         BigDecimal taxAmount = totalItemPrice[0].multiply(BigDecimal.valueOf(0.05));
         BigDecimal shippingPrice = BigDecimal.valueOf(150);
@@ -95,7 +97,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse getOrder(Long orderId) {
         log.info("Fetching order with ID: {}", orderId);
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(String.format(ORDER_NOT_FOUND_MSG, orderId))));
         return orderMapper.toResponse(order);
     }
 
@@ -121,7 +123,7 @@ public class OrderServiceImpl implements OrderService {
                         log.error("Failed to map order to response", e);
                         throw new IllegalStateException("Failed to map order to response", e);
                     }
-                }).collect(Collectors.toList());
+                }).toList();
     }
 
     @Override
@@ -131,7 +133,7 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.findByUserAndStatus(user, status)
                 .stream()
                 .map(orderMapper::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -150,7 +152,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
         log.info("Updating order status for order ID: {} to {}", orderId, newStatus);
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ORDER_NOT_FOUND_MSG, orderId)));
         if (!OrderStatus.contains(String.valueOf(newStatus))) {
             log.error("Invalid order status: {}", newStatus);
             throw new IllegalArgumentException("Invalid order status: " + newStatus);
@@ -190,7 +192,7 @@ public class OrderServiceImpl implements OrderService {
     public byte[] downloadInvoice(Long orderId) {
         log.info("Downloading invoice for order with ID: {}", orderId);
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ORDER_NOT_FOUND_MSG, orderId)));
         String invoiceText = "Invoice for Order #: " + order.getOrderNumber() + "\n"
                            + "Total: " + order.getTotalPrice() + " " + order.getCurrencyCode();
         return invoiceText.getBytes();

@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class AdminCategoryControllerTest {
+class AdminCategoryControllerTest {
 
     @Mock
     private CategoryService categoryService;
@@ -24,12 +24,12 @@ public class AdminCategoryControllerTest {
     private AdminCategoryController adminCategoryController;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testAddCategory() {
+    void testAddCategory() {
         CategoryRequest categoryRequest = new CategoryRequest();
         categoryRequest.setName("Electronics");
         categoryRequest.setDescription("Electronic items");
@@ -49,7 +49,7 @@ public class AdminCategoryControllerTest {
     }
 
     @Test
-    public void testUpdateCategory() {
+    void testUpdateCategory() {
         Long categoryId = 1L;
         CategoryRequest categoryRequest = new CategoryRequest();
         categoryRequest.setName("Electronics");
@@ -70,7 +70,7 @@ public class AdminCategoryControllerTest {
     }
 
     @Test
-    public void testDeleteCategory() {
+    void testDeleteCategory() {
         Long categoryId = 1L;
 
         doNothing().when(categoryService).deleteCategoryById(categoryId);

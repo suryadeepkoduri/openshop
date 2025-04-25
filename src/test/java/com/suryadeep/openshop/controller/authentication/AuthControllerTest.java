@@ -99,11 +99,11 @@ class AuthControllerTest {
     @Test
     void testAuthenticateUser_Success() throws Exception {
         Authentication authentication = mock(Authentication.class);
-        User user = new User();
-        user.setEmail("test@example.com");
-        user.setPassword("password");
-        user.setRoles(new HashSet<>() {{
-            String user1 = "USER";
+        User testUser = new User();
+        testUser.setEmail("test@example.com");
+        testUser.setPassword("password");
+        testUser.setRoles(new HashSet<>() {{
+            new String("USER");
         }});
         CustomUserDetails userDetails = new CustomUserDetails(user);
 

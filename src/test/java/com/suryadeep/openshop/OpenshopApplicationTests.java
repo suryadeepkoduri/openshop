@@ -1,4 +1,4 @@
-//package com.suryadeep.openshop;
+package com.suryadeep.openshop;
 //
 //import org.junit.jupiter.api.Test;
 //import org.springframework.boot.test.context.SpringBootTest;

@@ -1,6 +1,5 @@
 package com.suryadeep.openshop.dto.request;
 
-import com.suryadeep.openshop.entity.enums.PaymentStatus;
 import lombok.Data;
 
 @Data

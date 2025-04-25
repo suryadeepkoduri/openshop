@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class CartServiceTest {
+class CartServiceTest {
 
     @Mock
     private CartRepository cartRepository;
@@ -52,12 +52,12 @@ public class CartServiceTest {
     private CartServiceImpl cartService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testGetCart() {
+    void testGetCart() {
         User user = new User();
         Cart cart = new Cart();
         user.setCart(cart);
@@ -73,7 +73,7 @@ public class CartServiceTest {
     }
 
     @Test
-    public void testAddItemToCart() {
+    void testAddItemToCart() {
         User user = new User();
         Cart cart = new Cart();
         user.setCart(cart);
@@ -101,7 +101,7 @@ public class CartServiceTest {
     }
 
     @Test
-    public void testAddItemToCartWithNonExistentVariant() {
+    void testAddItemToCartWithNonExistentVariant() {
         User user = new User();
         Cart cart = new Cart();
         user.setCart(cart);
@@ -124,7 +124,7 @@ public class CartServiceTest {
     }
 
     @Test
-    public void testAddItemToCartWithCorrectQuantity() {
+    void testAddItemToCartWithCorrectQuantity() {
         User user = new User();
         Cart cart = new Cart();
         user.setCart(cart);
@@ -156,7 +156,7 @@ public class CartServiceTest {
     }
 
     @Test
-    public void testUpdateItemInCart() {
+    void testUpdateItemInCart() {
         User user = new User();
         Cart cart = new Cart();
         CartItem cartItem = new CartItem();
@@ -182,7 +182,7 @@ public class CartServiceTest {
     }
 
     @Test
-    public void testRemoveItemFromCart() {
+    void testRemoveItemFromCart() {
         User user = new User();
         Cart cart = new Cart();
         CartItem cartItem = new CartItem();

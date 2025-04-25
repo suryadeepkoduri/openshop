@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class CartControllerTest {
+class CartControllerTest {
 
     @Mock
     private CartService cartService;
@@ -25,12 +25,12 @@ public class CartControllerTest {
     private CartController cartController;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testGetCart() {
+    void testGetCart() {
         CartResponse cartResponse = new CartResponse();
         when(cartService.getCart()).thenReturn(cartResponse);
 
@@ -41,7 +41,7 @@ public class CartControllerTest {
     }
 
     @Test
-    public void testAddCartItem() {
+    void testAddCartItem() {
         CartItemRequest cartItemRequest = new CartItemRequest();
         when(cartService.addItemToCart(any(CartItemRequest.class))).thenReturn(new CartItemResponse());
 
@@ -52,7 +52,7 @@ public class CartControllerTest {
     }
 
     @Test
-    public void testUpdateCartItem() {
+    void testUpdateCartItem() {
         Long cartItemId = 1L;
         CartItemRequest cartItemRequest = new CartItemRequest();
         when(cartService.updateItemInCart(any(CartItemRequest.class), eq(cartItemId))).thenReturn(new CartItemResponse());
@@ -64,7 +64,7 @@ public class CartControllerTest {
     }
 
     @Test
-    public void testRemoveCartItem() {
+    void testRemoveCartItem() {
         Long cartItemId = 1L;
         doNothing().when(cartService).removeItemFromCart(cartItemId);
 

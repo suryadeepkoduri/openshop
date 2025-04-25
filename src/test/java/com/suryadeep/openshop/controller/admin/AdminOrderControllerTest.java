@@ -13,10 +13,9 @@ import org.springframework.http.ResponseEntity;
 import com.suryadeep.openshop.dto.response.OrderResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class AdminOrderControllerTest {
+class AdminOrderControllerTest {
 
     @Mock
     private OrderService orderService;
@@ -25,12 +24,12 @@ public class AdminOrderControllerTest {
     private AdminOrderController adminOrderController;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testUpdateOrderStatus() {
+    void testUpdateOrderStatus() {
         Long orderId = 1L;
         OrderStatus status = OrderStatus.SHIPPED;
 
@@ -44,22 +43,8 @@ public class AdminOrderControllerTest {
         verify(orderService, times(1)).updateOrderStatus(orderId, status);
     }
 
-//    @Test
-//    public void testVerifyPayment() {
-//        Long orderId = 1L;
-//        String paymentId = "TXN123";
-//
-//        when(orderService.verifyPayment(paymentId)).thenReturn(true);
-//
-//        ResponseEntity<Object> response = adminOrderController.verifyPayment(orderId, paymentId);
-//
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        assertEquals("Payment verified", response.getBody());
-//        verify(orderService, times(1)).verifyPayment(paymentId);
-//    }
-
     @Test
-    public void testGetOrders() {
+    void testGetOrders() {
         int page = 0;
         int size = 10;
 
@@ -74,7 +59,7 @@ public class AdminOrderControllerTest {
     }
 
     @Test
-    public void testGetOrderByStatus() {
+    void testGetOrderByStatus() {
         OrderStatus status = OrderStatus.PENDING;
         int page = 0;
         int size = 10;

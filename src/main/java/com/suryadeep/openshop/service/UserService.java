@@ -4,7 +4,6 @@ import com.suryadeep.openshop.dto.request.AddressRequest;
 import com.suryadeep.openshop.dto.request.UserRegisterRequest;
 import com.suryadeep.openshop.dto.response.AddressResponse;
 import com.suryadeep.openshop.dto.response.UserResponse;
-import com.suryadeep.openshop.entity.Address;
 import com.suryadeep.openshop.entity.User;
 
 import java.util.List;

@@ -26,7 +26,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
-    private final CartRepository cartRepository;
 
     @Transactional
     public User registerUser(UserRegisterRequest registerRequest) throws EmailAlreadyExistsException {
