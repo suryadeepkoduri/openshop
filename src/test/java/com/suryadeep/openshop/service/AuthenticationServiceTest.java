@@ -66,7 +66,7 @@ class AuthenticationServiceTest {
         // FIX: Make save return the user object it was called with
         when(userRepository.save(any(User.class))).thenAnswer(new Answer<User>() {
             @Override
-            User answer(InvocationOnMock invocation) throws Throwable {
+            public User answer(InvocationOnMock invocation) throws Throwable {
                 return invocation.getArgument(0); // Return the first argument passed to save()
             }
         });
