@@ -3,6 +3,8 @@ package com.suryadeep.openshop.entity;
 import com.suryadeep.openshop.entity.enums.OrderStatus;
 import com.suryadeep.openshop.entity.enums.PaymentStatus;
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
@@ -20,7 +22,12 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "orders")
+@Table(name = "orders", indexes = {
+    @Index(name = "idx_order_user", columnList = "user_id"),
+    @Index(name = "idx_order_status", columnList = "status"),
+    @Index(name = "idx_order_number", columnList = "orderNumber", unique = true),
+    @Index(name = "idx_payment_ref", columnList = "paymentRefNo", unique = true)
+})
 public class Order {
 
     @Id

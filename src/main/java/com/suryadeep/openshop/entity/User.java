@@ -1,6 +1,8 @@
 package com.suryadeep.openshop.entity;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -10,7 +12,10 @@ import java.util.*;
 
 @Getter
 @Setter
-@Table(name = "users")
+@Table(name = "users", indexes = {
+    @Index(name = "idx_user_email", columnList = "email", unique = true),
+    @Index(name = "idx_user_phone", columnList = "phoneNumber")
+})
 @Entity
 public class User {
     @Id

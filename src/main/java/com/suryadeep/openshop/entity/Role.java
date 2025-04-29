@@ -1,12 +1,16 @@
 package com.suryadeep.openshop.entity;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
+import jakarta.persistence.Index;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Table(name = "roles")
+@Table(name = "roles", indexes = {
+    @Index(name = "idx_role_name", columnList = "roleName")
+})
 @Entity
 public class Role {
     @Id
