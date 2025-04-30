@@ -12,6 +12,8 @@ import com.suryadeep.openshop.repository.UserRepository;
 import com.suryadeep.openshop.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ public class UserServiceImpl implements UserService {
     private final EntityMapper entityMapper;
 
     @Override
+    @Cacheable(value = "users", key = "#root.target.getCurrentAuthenticatedUserEmail()")
     public UserResponse getCurrentUser() {
         User user = getCurrentAuthenticatedUser();
         log.info("Fetching current user profile for user with ID: {}", user.getId());
@@ -38,19 +41,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "users", key = "#root.target.getCurrentAuthenticatedUserEmail()")
     public UserResponse updateCurrentUser(UserRegisterRequest userRequest) {
         User user = getCurrentAuthenticatedUser();
         log.info("Updating current user profile for user with ID: {}", user.getId());
         user.setName(userRequest.getUsername());
         // Don't update email as it's a unique identifier
         // Don't update password here - should be handled by a separate password change service
-        
+
         User updatedUser = userRepository.save(user);
         log.info("User profile updated successfully for user with ID: {}", user.getId());
         return entityMapper.toUserResponse(updatedUser);
     }
 
     @Override
+    @Cacheable(value = "users", key = "'addresses_' + #root.target.getCurrentAuthenticatedUserEmail()")
     public List<AddressResponse> getAddressess() {
         User user = getCurrentAuthenticatedUser();
         log.info("Fetching addresses for user with ID: {}", user.getId());
@@ -59,6 +64,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "users", key = "'addresses_' + #root.target.getCurrentAuthenticatedUserEmail()")
     public AddressResponse addAddress(AddressRequest addressRequest) {
         User user = getCurrentAuthenticatedUser();
         log.info("Adding new address for user with ID: {}", user.getId());
@@ -72,6 +78,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "users", key = "'addresses_' + #root.target.getCurrentAuthenticatedUserEmail()")
     public AddressResponse updateUserAddress(Long id, AddressRequest updatedAddress) {
         User user = getCurrentAuthenticatedUser();
         log.info("Updating address with ID: {} for user with ID: {}", id, user.getId());
@@ -94,6 +101,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "users", key = "'addresses_' + #root.target.getCurrentAuthenticatedUserEmail()")
     public void deleteUserAddress(Long id) {
         User user = getCurrentAuthenticatedUser();
         log.info("Deleting address with ID: {} for user with ID: {}", id, user.getId());
@@ -120,5 +128,21 @@ public class UserServiceImpl implements UserService {
         log.info("Fetching current authenticated user with ID: {}", user.getId());
         return user;
     }
-    
+
+    /**
+     * Helper method to get the email of the currently authenticated user.
+     * Used for cache key generation.
+     * 
+     * @return the email of the currently authenticated user
+     */
+    public String getCurrentAuthenticatedUserEmail() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        if (userDetails == null) {
+            log.error("Principal cannot be null");
+            throw new IllegalStateException("Principal cannot be null");
+        }
+        return userDetails.getUsername();
+    }
+
 }

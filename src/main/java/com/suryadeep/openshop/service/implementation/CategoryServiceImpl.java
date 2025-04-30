@@ -9,6 +9,10 @@ import com.suryadeep.openshop.repository.CategoryRepository;
 import com.suryadeep.openshop.service.CategoryService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final EntityMapper entityMapper;
 
     @Override
+    @Cacheable(value = "categories", key = "'allCategories'")
     public List<CategoryResponse> getAllCategories() {
         log.info("Fetching all categories");
         return categoryRepository.findAll().stream()
@@ -33,6 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Cacheable(value = "categories", key = "#id")
     public CategoryResponse getCategoryById(Long id) throws CategoryNotFoundException {
         log.info("Fetching category with ID: {}", id);
         Category category = categoryRepository.findById(id)
@@ -41,6 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @CacheEvict(value = "categories", key = "'allCategories'")
     public CategoryResponse createCategory(CategoryRequest categoryRequest) {
         log.info("Creating new category: {}", categoryRequest.getName());
         Category category = entityMapper.toCategoryEntity(categoryRequest);
@@ -50,6 +57,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
+    @Caching(
+        evict = {
+            @CacheEvict(value = "categories", key = "#categoryId"),
+            @CacheEvict(value = "categories", key = "'allCategories'")
+        }
+    )
     public CategoryResponse updateCategory(CategoryRequest categoryRequest, Long categoryId) throws CategoryNotFoundException {
         log.info("Updating category with ID: {}", categoryId);
         Category existingCategory = categoryRepository.findById(categoryId)
@@ -62,6 +75,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
+    @Caching(
+        evict = {
+            @CacheEvict(value = "categories", key = "#id"),
+            @CacheEvict(value = "categories", key = "'allCategories'")
+        }
+    )
     public void deleteCategoryById(Long id) throws CategoryNotFoundException {
         log.info("Deleting category with ID: {}", id);
         Category category = categoryRepository.findById(id)
@@ -70,6 +89,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Cacheable(value = "categories", key = "'page_' + #page + '_size_' + #size")
     public Page<CategoryResponse> findAllPaginated(int page, int size) {
         log.info("Fetching all categories with pagination - page: {}, size: {}", page, size);
         return categoryRepository.findAll(PageRequest.of(page, size))
