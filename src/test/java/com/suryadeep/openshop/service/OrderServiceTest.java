@@ -171,6 +171,9 @@
         @Test
         void testCancelOrder() {
             Order order = new Order();
+            User user = new User();
+            user.setId(1L);
+            order.setUser(user);
             order.setStatus(OrderStatus.PENDING);
             when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
 
