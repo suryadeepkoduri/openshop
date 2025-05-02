@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -34,7 +35,7 @@ public class Product {
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "image_id")
     )
-    private List<Image> images;
+    private List<Image> images = new ArrayList<>();
     private boolean isEnabled;
 
     @ManyToOne
@@ -42,6 +43,6 @@ public class Product {
     private Category category;
 
     @OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
-    private List<Variant> variants;
+    private List<Variant> variants = new ArrayList<>();
 
 }

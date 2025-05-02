@@ -7,6 +7,7 @@ import com.suryadeep.openshop.entity.*;
 import org.mapstruct.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface EntityMapper {
@@ -16,7 +17,15 @@ public interface EntityMapper {
     @Mapping(target = "images", ignore = true) // handled manually
     Product toProductEntity(ProductRequest request);
 
+    @Named("imagesToUrls")
+    default List<String> imagesToUrls(List<Image> images) {
+        if (images == null) return null;
+        return images.stream()
+                .map(Image::getImageKey)  // assuming getUrl() exists in Image entity
+                .collect(Collectors.toList());
+    }
     @Mapping(target = "categoryName", source = "category.name")
+    @Mapping(target = "images", source = "images", qualifiedByName = "imagesToUrls")
     ProductResponse toProductResponse(Product product);
 
     List<ProductResponse> toProductResponseList(List<Product> products);
@@ -34,6 +43,7 @@ public interface EntityMapper {
     @Mapping(target = "images",ignore = true)
     Category toCategoryEntity(CategoryRequest request);
 
+    @Mapping(target = "images", source = "images", qualifiedByName = "imagesToUrls")
     CategoryResponse toCategoryResponse(Category category);
 
     List<CategoryResponse> toCategoryResponseList(List<Category> categories);
@@ -65,4 +75,11 @@ public interface EntityMapper {
 
     List<CartResponse> toResponseList(List<Cart> carts);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "name", expression = "java(getImageNameFromUrl(url))")
+    Image toImageEntity(String url);
+
+    default String getImageNameFromUrl(String url) {
+        return url.substring(url.lastIndexOf('/') + 1);
+    }
 }

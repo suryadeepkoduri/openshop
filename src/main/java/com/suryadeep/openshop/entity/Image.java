@@ -15,5 +15,5 @@ public class Image {
     @Column(nullable = false, updatable = false)
     private Long id;
     private String name;
-    private String imageUrl;
+    private String imageKey;
 }
